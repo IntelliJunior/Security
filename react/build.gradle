@@ -1,0 +1,27 @@
+plugins {
+    id "com.github.node-gradle.node" version "7.1.0"
+}
+
+node {
+    // ✅ Modern Gradle Node plugin syntax
+    download = true
+    version = "22.16.0"
+    npmVersion = "10.9.2"
+    workDir = file("${project.buildDir}/nodejs")
+    npmWorkDir = file("${project.buildDir}/npm")
+    // nodeModulesDir property is REMOVED in v7+, so we skip it
+}
+
+// ✅ Define React build task (production build)
+tasks.register("npmBuild", com.github.gradle.node.npm.task.NpmTask) {
+    dependsOn("npmInstall")
+    args = ["run", "build"]
+    inputs.dir("src")
+    outputs.dir("dist")
+}
+
+// ✅ Define React start task (for local development)
+tasks.register("npmStart", com.github.gradle.node.npm.task.NpmTask) {
+    dependsOn("npmInstall")
+    args = ["run", "dev"]
+}

@@ -1,0 +1,63 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.5.6'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.service'
+version = '0.0.1-SNAPSHOT'
+description = 'Security Service Application'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+ext {
+	jjwtVersion = '0.11.5'
+}
+
+dependencies {
+	// Core Spring Boot starters
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	implementation 'com.itextpdf:itextpdf:5.5.13.3'
+
+	// Database connector
+	implementation 'com.mysql:mysql-connector-j:9.0.0'
+
+	// JWT dependencies
+	implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
+	runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
+	runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
+
+	// Dev tools
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+	// Testing
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+// ✅ Ensure React build runs before backend resources are processed
+tasks.register("copyReactBuild", Copy) {
+	dependsOn(":react:npmBuild")
+	from(project(":react").file("dist"))
+	into("${project.projectDir}/src/main/resources/static")
+}
+
+tasks.named("processResources") {
+	dependsOn("copyReactBuild")
+}
+
+tasks.named("test") {
+	useJUnitPlatform()
+}
