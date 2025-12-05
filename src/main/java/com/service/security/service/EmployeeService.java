@@ -141,11 +141,11 @@ public class EmployeeService {
 
     public List<Employee> searchEmployees(String name, String mobile, String fatherName) {
         if (name != null && !name.isBlank()) {
-            return repo.findByNameContainingIgnoreCase(name);
+            return repo.searchEmployees(name, mobile, fatherName);
         } else if (mobile != null && !mobile.isBlank()) {
-            return repo.findByMobileContaining(mobile);
+            return repo.searchEmployees(name, mobile, fatherName);
         } else if (fatherName != null && !fatherName.isBlank()) {
-            return repo.findByFatherNameContainingIgnoreCase(fatherName);
+            return repo.searchEmployees(name, mobile, fatherName);
         } else {
             return List.of(); // empty list when nothing searched
         }
