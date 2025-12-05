@@ -76,6 +76,8 @@ public class Employee {
 
     private LocalDateTime registeredAt = LocalDateTime.now();
 
+    private String photo;
+
     public Long getId() {
         return id;
     }
@@ -498,6 +500,14 @@ public class Employee {
 
     public void setRegisteredAt(LocalDateTime registeredAt) {
         this.registeredAt = registeredAt;
+    }
+
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
     }
 
 }

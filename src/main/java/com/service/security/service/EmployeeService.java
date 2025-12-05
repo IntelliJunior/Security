@@ -2,23 +2,53 @@ package com.service.security.service;
 
 import com.service.security.model.Employee;
 import com.service.security.repository.EmployeeRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class EmployeeService {
 
     private final EmployeeRepository repo;
 
+    @Value("${file.upload-dir}")
+    private String uploadDir;
+
     public EmployeeService(EmployeeRepository repo) {
         this.repo = repo;
     }
 
     // Create
-    public Employee saveEmployee(Employee employee) {
+    public Employee saveEmployee(Employee employee, MultipartFile photo) throws IOException {
+        if (photo != null && !photo.isEmpty()) {
+
+            // Use the configured folder
+            Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
+            Files.createDirectories(uploadPath);
+
+            // Unique file name
+            String fileName = UUID.randomUUID() + "_" + photo.getOriginalFilename();
+            Path filePath = uploadPath.resolve(fileName);
+
+            // Save file permanently
+            Files.copy(photo.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            // Save relative path for easy access in PDF
+            employee.setPhoto("uploads/employees/" + fileName);
+        }
+
         return repo.save(employee);
     }
+
+
 
     // Read all (latest first)
     public List<Employee> getAllEmployeesDesc() {
@@ -108,4 +138,17 @@ public class EmployeeService {
         }
         repo.deleteById(id);
     }
+
+    public List<Employee> searchEmployees(String name, String mobile, String fatherName) {
+        if (name != null && !name.isBlank()) {
+            return repo.findByNameContainingIgnoreCase(name);
+        } else if (mobile != null && !mobile.isBlank()) {
+            return repo.findByMobileContaining(mobile);
+        } else if (fatherName != null && !fatherName.isBlank()) {
+            return repo.findByFatherNameContainingIgnoreCase(fatherName);
+        } else {
+            return List.of(); // empty list when nothing searched
+        }
+    }
+
 }
