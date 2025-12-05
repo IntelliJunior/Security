@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Service
 public class EmployeePdfService {
@@ -33,9 +36,7 @@ public class EmployeePdfService {
 
             Paragraph address = new Paragraph(
                     "H.O.: 1st Floor Hilsa Kothi, Near Post Office, Jamal Road, Patna - 800001\n" +
-                            "Phone No.: 09308183643, (O) Telefax No.: 91-612-2239307\n" +
-                            "B.O.: R.K. Tower, 2nd Floor Room No. 117, Opp. Akashvani, Adityapur, Jamshedpur-13 (Jharkhand)\n" +
-                            "Ph.: 09386598498\n\n",
+                            "Phone No.: 09308183643, (O) Telefax No.: 91-612-2239307\n\n",
                     valueFont);
             address.setAlignment(Element.ALIGN_CENTER);
             document.add(address);
@@ -49,8 +50,19 @@ public class EmployeePdfService {
             formTitle.setSpacingAfter(10);
             document.add(formTitle);
 
-            // ======= BASIC DETAILS =======
-            addSectionHeader(document, "Basic Details", subTitleFont);
+            // ======= BASIC DETAILS SECTION + PHOTO SIDE BY SIDE =======
+            PdfPTable headerTable = new PdfPTable(new float[]{3, 1});
+            headerTable.setWidthPercentage(100);
+            headerTable.getDefaultCell().setBorder(Rectangle.NO_BORDER);
+
+            // LEFT CELL - BASIC DETAILS
+            PdfPCell leftCell = new PdfPCell();
+            leftCell.setBorder(Rectangle.NO_BORDER);
+
+            Paragraph basicHeader = new Paragraph("Basic Details:", subTitleFont);
+            basicHeader.setSpacingAfter(5);
+            leftCell.addElement(basicHeader);
+
             PdfPTable basicTable = new PdfPTable(4);
             basicTable.setWidthPercentage(100);
             basicTable.getDefaultCell().setBorder(Rectangle.NO_BORDER);
@@ -61,7 +73,37 @@ public class EmployeePdfService {
             addRow(basicTable, "District", emp.getDistrict(), "Block", emp.getBlock(), labelFont, valueFont);
             addRow(basicTable, "Subdivision", emp.getSubdivision(), "Pin Code", emp.getPinCode(), labelFont, valueFont);
             addRow(basicTable, "Qualification", emp.getQualification(), "Nearest Railway Station", emp.getNearestRailwayStation(), labelFont, valueFont);
-            document.add(basicTable);
+            leftCell.addElement(basicTable);
+
+            headerTable.addCell(leftCell);
+
+            // RIGHT CELL - PHOTO
+            PdfPCell rightCell = new PdfPCell();
+            rightCell.setBorder(Rectangle.NO_BORDER);
+            rightCell.setVerticalAlignment(Element.ALIGN_TOP);
+            rightCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+            if (emp.getPhoto() != null && !emp.getPhoto().isEmpty()) {
+                try {
+                    // Normalize and resolve actual path
+                    String relativePath = emp.getPhoto().replace("\\", "/");
+                    Path imagePath = Paths.get("src/main/resources/static", relativePath);
+
+                    if (Files.exists(imagePath)) {
+                        Image empPhoto = Image.getInstance(imagePath.toAbsolutePath().toString());
+                        empPhoto.scaleToFit(120, 120); // photo size
+                        empPhoto.setAlignment(Element.ALIGN_RIGHT);
+                        rightCell.addElement(empPhoto);
+                    } else {
+                        System.out.println("⚠️ Photo not found at: " + imagePath.toAbsolutePath());
+                    }
+                } catch (Exception imgEx) {
+                    imgEx.printStackTrace();
+                }
+            }
+
+            headerTable.addCell(rightCell);
+            document.add(headerTable);
             document.add(Chunk.NEWLINE);
 
             // ======= PHYSICAL DETAILS =======

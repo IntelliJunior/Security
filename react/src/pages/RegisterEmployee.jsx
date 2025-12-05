@@ -1,4 +1,3 @@
-// src/pages/RegisterEmployee.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
@@ -85,6 +84,8 @@ const initialFormState = {
 export default function RegisterEmployee() {
   const navigate = useNavigate();
   const [form, setForm] = useState(initialFormState);
+  const [photo, setPhoto] = useState(null);
+  const [preview, setPreview] = useState(null);
   const [message, setMessage] = useState("");
 
   const handleChange = (e) => {
@@ -92,12 +93,42 @@ export default function RegisterEmployee() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setPhoto(file);
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => setPreview(reader.result);
+      reader.readAsDataURL(file);
+    } else {
+      setPreview(null);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      await api.post("/admin/employees/register", form);
+      const formData = new FormData();
+
+      // Append JSON as a Blob
+      formData.append(
+        "employee",
+        new Blob([JSON.stringify(form)], { type: "application/json" })
+      );
+
+      // Append file if selected
+      if (photo) {
+        formData.append("photo", photo);
+      }
+
+      await api.post("/admin/employees/register", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+
       setMessage("✅ Employee registered successfully!");
-      setTimeout(() => navigate("/dashboard"), 1000);
+      setTimeout(() => navigate("/dashboard"), 1200);
     } catch (err) {
       console.error(err);
       setMessage("❌ Failed to register employee");
@@ -130,6 +161,25 @@ export default function RegisterEmployee() {
             <TextInput name="pinCode" value={form.pinCode} onChange={handleChange} placeholder="Pin Code" />
             <TextInput name="qualification" value={form.qualification} onChange={handleChange} placeholder="Qualification" />
             <TextInput name="nearestRailwayStation" value={form.nearestRailwayStation} onChange={handleChange} placeholder="Nearest Railway Station" />
+          </Section>
+
+          {/* PHOTO UPLOAD SECTION */}
+          <Section title="Employee Photo">
+            <div className="flex flex-col items-center">
+              {preview && (
+                <img
+                  src={preview}
+                  alt="Preview"
+                  className="w-40 h-40 object-cover mb-3 rounded border"
+                />
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="border p-2 rounded w-full"
+              />
+            </div>
           </Section>
 
           {/* PHYSICAL DETAILS */}

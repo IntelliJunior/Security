@@ -5,6 +5,7 @@ import com.service.security.service.EmployeeService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -20,9 +21,17 @@ public class AdminController {
 
     // Register employee
     @PostMapping("/employees/register")
-    public ResponseEntity<Employee> registerEmployee(@Valid @RequestBody Employee employee) {
-        Employee saved = employeeService.saveEmployee(employee);
-        return ResponseEntity.ok(saved);
+    public ResponseEntity<?> registerEmployee(
+            @RequestPart("employee") Employee employee,
+            @RequestPart(value = "photo", required = false) MultipartFile photo) {
+
+        try {
+            Employee saved = employeeService.saveEmployee(employee, photo);
+            return ResponseEntity.ok(saved);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+        }
     }
 
     // List all employees (descending by registration date)

@@ -4,7 +4,9 @@ import Dashboard from "./pages/Dashboard";
 import RegisterEmployee from "./pages/RegisterEmployee";
 import EditEmployee from "./pages/EditEmployee";
 import EmployeeDetails from "./pages/EmployeeDetails";
+import SearchEmployee from "./pages/SearchEmployee";
 import ProtectedRoute from "./components/ProtectedRoute";
+
 
 function App() {
   return (
@@ -21,6 +23,9 @@ function App() {
           path="/dashboard/register"
           element={<ProtectedRoute><RegisterEmployee /></ProtectedRoute>}
         />
+        <Route path="/dashboard/search"
+        element={<ProtectedRoute><SearchEmployee /></ProtectedRoute>}
+         />
         <Route
           path="/dashboard/edit/:id"
           element={<ProtectedRoute><EditEmployee /></ProtectedRoute>}
