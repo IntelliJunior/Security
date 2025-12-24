@@ -1,7 +1,12 @@
 package com.service.security.model;
 
+
 import jakarta.persistence.*;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "employees")
@@ -14,12 +19,17 @@ public class Employee {
     // Basic details
     private String through;
     private String phoneNo;
-    private String date;
+    private LocalDate date;
     private String name;
     private String mobile;
     private String fatherName;
     private String fatherOccupation;
-    private Integer age;
+    private LocalDate dateOfBirth;
+    private LocalDate fatherDateOfBirth;
+
+
+    private LocalDate motherDateOfBirth;
+    private LocalDate wifeDateOfBirth;
     private String village;
     private String po;
     private String block;
@@ -56,16 +66,32 @@ public class Employee {
     private String presentPo;
     private String presentPs;
     private String presentDistrict;
+    private String presentState;
+    private String presentPinCode;
 
     // Family details
     private String motherName;
     private String motherOccupation;
-    private Integer motherAge;
+
     private String wifeName;
     private String wifeOccupation;
-    private Integer wifeAge;
-    private String sons;       // comma-separated values
-    private String daughters;  // comma-separated values
+
+    @ElementCollection
+    @CollectionTable(
+            name = "employee_sons",
+            joinColumns = @JoinColumn(name = "employee_id")
+    )
+    private List<Child> sons = new ArrayList<>();
+
+
+
+    @ElementCollection
+    @CollectionTable(
+            name = "employee_daughters",
+            joinColumns = @JoinColumn(name = "employee_id")
+    )
+    private List<Child> daughters = new ArrayList<>();
+
 
     // Other details
     private Double totalFee;
@@ -73,6 +99,9 @@ public class Employee {
     private Double balance;
     private String appointmentUnit;
     private String post;
+    private String licenseNo;
+    private String validArea;
+    private LocalDate renewalUpto;
 
     private LocalDateTime registeredAt = LocalDateTime.now();
 
@@ -102,20 +131,20 @@ public class Employee {
         this.phoneNo = phoneNo;
     }
 
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
-
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
     public String getMobile() {
@@ -142,13 +171,7 @@ public class Employee {
         this.fatherOccupation = fatherOccupation;
     }
 
-    public Integer getAge() {
-        return age;
-    }
 
-    public void setAge(Integer age) {
-        this.age = age;
-    }
 
     public String getVillage() {
         return village;
@@ -389,6 +412,21 @@ public class Employee {
     public void setPresentDistrict(String presentDistrict) {
         this.presentDistrict = presentDistrict;
     }
+    public String getPresentState() {
+        return presentState;
+    }
+
+    public void setPresentState(String presentState) {
+        this.presentState = presentState;
+    }
+
+    public String getPresentPinCode() {
+        return presentPinCode;
+    }
+
+    public void setPresentPinCode(String presentPinCode) {
+        this.presentPinCode = presentPinCode;
+    }
 
     public String getMotherName() {
         return motherName;
@@ -406,13 +444,7 @@ public class Employee {
         this.motherOccupation = motherOccupation;
     }
 
-    public Integer getMotherAge() {
-        return motherAge;
-    }
 
-    public void setMotherAge(Integer motherAge) {
-        this.motherAge = motherAge;
-    }
 
     public String getWifeName() {
         return wifeName;
@@ -430,27 +462,20 @@ public class Employee {
         this.wifeOccupation = wifeOccupation;
     }
 
-    public Integer getWifeAge() {
-        return wifeAge;
-    }
 
-    public void setWifeAge(Integer wifeAge) {
-        this.wifeAge = wifeAge;
-    }
-
-    public String getSons() {
+    public List<Child> getSons() {
         return sons;
     }
 
-    public void setSons(String sons) {
+    public void setSons(List<Child> sons) {
         this.sons = sons;
     }
 
-    public String getDaughters() {
+    public List<Child> getDaughters() {
         return daughters;
     }
 
-    public void setDaughters(String daughters) {
+    public void setDaughters(List<Child> daughters) {
         this.daughters = daughters;
     }
 
@@ -509,5 +534,62 @@ public class Employee {
     public void setPhoto(String photo) {
         this.photo = photo;
     }
+
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public LocalDate getFatherDateOfBirth() {
+        return fatherDateOfBirth;
+    }
+
+    public void setFatherDateOfBirth(LocalDate fatherDateOfBirth) {
+        this.fatherDateOfBirth = fatherDateOfBirth;
+    }
+
+    public LocalDate getMotherDateOfBirth() {
+        return motherDateOfBirth;
+    }
+
+    public void setMotherDateOfBirth(LocalDate motherDateOfBirth) {
+        this.motherDateOfBirth = motherDateOfBirth;
+    }
+
+    public LocalDate getWifeDateOfBirth() {
+        return wifeDateOfBirth;
+    }
+
+    public void setWifeDateOfBirth(LocalDate wifeDateOfBirth) {
+        this.wifeDateOfBirth = wifeDateOfBirth;
+    }
+
+    public String getLicenseNo() {
+        return licenseNo;
+    }
+
+    public void setLicenseNo(String licenseNo) {
+        this.licenseNo = licenseNo;
+    }
+
+    public String getValidArea() {
+        return validArea;
+    }
+
+    public void setValidArea(String validArea) {
+        this.validArea = validArea;
+    }
+
+    public LocalDate getRenewalUpto() {
+        return renewalUpto;
+    }
+
+    public void setRenewalUpto(LocalDate renewalUpto) {
+        this.renewalUpto = renewalUpto;
+    }
+
 
 }

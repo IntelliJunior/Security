@@ -3,6 +3,44 @@ import React, { useEffect, useState, memo } from "react"; // ⬅️ ADD React an
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../api/axios";
 
+export const MemoizedSelect = memo(
+  ({ name, value, onChange, options, required = false }) => {
+    const selectValue = value ?? "";
+
+    return (
+      <select
+        name={name}
+        value={selectValue}
+        onChange={onChange}
+        required={required}
+        className="border p-2 rounded bg-white"
+      >
+        <option value="">-- Select Post --</option>
+        {options.map((opt) => (
+          <option key={opt} value={opt}>
+            {opt}
+          </option>
+        ))}
+      </select>
+    );
+  }
+);
+
+const POST_OPTIONS = [
+  "S/G",
+  "H/G",
+  "S/S",
+  "Sr/S/S",
+  "S/Ins",
+  "Arms Guard",
+  "S/Officer",
+  "Labour",
+  "Helper",
+  "Civil Supervisor",
+  "Bouncer",
+  "Assistant Manager",
+];
+
 // 1. EXTRACT AND MEMOIZE THE INPUT COMPONENT
 const MemoizedInput = memo(
   ({ name, placeholder, type = "text", required = false, value, onChange }) => {
@@ -45,11 +83,10 @@ export default function EditEmployee() {
     mobile: "",
     fatherName: "",
     fatherOccupation: "",
-    age: "",
+    fatherDateOfBirth: "",
+    dateOfBirth: "",
     village: "",
     po: "",
-    block: "",
-    subdivision: "",
     district: "",
     pinCode: "",
     qualification: "",
@@ -72,27 +109,32 @@ export default function EditEmployee() {
     addressPhone: "",
     houseNo: "",
     roadNo: "",
-    wardNo: "",
     presentPo: "",
     presentPs: "",
     presentDistrict: "",
+    presentState: "",
+    presentPinCode: "",
     motherName: "",
     motherOccupation: "",
-    motherAge: "",
+    motherDateOfBirth: "",
     wifeName: "",
     wifeOccupation: "",
-    wifeAge: "",
-    sons: "",
-    daughters: "",
+    wifeDateOfBirth: "",
+    sons: [],
+    daughters: [],
     totalFee: "",
     paidAmount: "",
     balance: "",
     appointmentUnit: "",
     post: "",
+    licenseNo: "",
+    validArea: "",
+    renewalUpto: "",
   };
 
   const [form, setForm] = useState(initialFormState);
   const [message, setMessage] = useState("");
+  const isArmsGuard = form.post === "Arms Guard";
 
   // Fetch employee data by ID
   const fetchEmployee = async () => {
@@ -112,8 +154,55 @@ export default function EditEmployee() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+
+    setForm((prev) => {
+      let updatedForm = { ...prev, [name]: value };
+
+      // Clear Arms Guard fields if post changes
+      if (name === "post" && value !== "Arms Guard") {
+        updatedForm = {
+          ...updatedForm,
+          licenseNo: "",
+          validArea: "",
+          renewalUpto: "",
+        };
+      }
+
+      // Auto-calculate balance
+      if (name === "totalFee" || name === "paidAmount") {
+        const total = Number(updatedForm.totalFee) || 0;
+        const paid = Number(updatedForm.paidAmount) || 0;
+        updatedForm.balance = total - paid;
+      }
+
+      return updatedForm;
+    });
   };
+
+
+
+  const handleChildChange = (type, index, field, value) => {
+    setForm(prev => {
+      const updated = [...prev[type]];
+      updated[index][field] = value;
+      return { ...prev, [type]: updated };
+    });
+  };
+
+  const addChild = (type) => {
+    setForm(prev => ({
+      ...prev,
+      [type]: [...prev[type], { name: "", dateOfBirth: "" }]
+    }));
+  };
+
+  const removeChild = (type, index) => {
+    setForm(prev => ({
+      ...prev,
+      [type]: prev[type].filter((_, i) => i !== index)
+    }));
+  };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -154,8 +243,6 @@ export default function EditEmployee() {
             <MemoizedInput name="age" placeholder="Age" type="number" value={form.age} onChange={handleChange} />
             <MemoizedInput name="village" placeholder="Village" value={form.village} onChange={handleChange} />
             <MemoizedInput name="po" placeholder="Post Office" value={form.po} onChange={handleChange} />
-            <MemoizedInput name="block" placeholder="Block" value={form.block} onChange={handleChange} />
-            <MemoizedInput name="subdivision" placeholder="Subdivision" value={form.subdivision} onChange={handleChange} />
             <MemoizedInput name="district" placeholder="District" value={form.district} onChange={handleChange} />
             <MemoizedInput name="pinCode" placeholder="Pin Code" value={form.pinCode} onChange={handleChange} />
             <MemoizedInput name="qualification" placeholder="Qualification" value={form.qualification} onChange={handleChange} />
@@ -178,44 +265,82 @@ export default function EditEmployee() {
           <Section title="Bank Details">
             <MemoizedInput name="accountHolderName" placeholder="Account Holder Name" value={form.accountHolderName} onChange={handleChange} />
             <MemoizedInput name="bankName" placeholder="Bank Name" value={form.bankName} onChange={handleChange} />
-            <MemoizedInput name="branchCode" placeholder="Branch Code" value={form.branchCode} onChange={handleChange} />
+            <MemoizedInput name="branchCode" placeholder="IFSC Code" value={form.branchCode} onChange={handleChange} />
             <MemoizedInput name="accountNo" placeholder="Account Number" value={form.accountNo} onChange={handleChange} />
             <MemoizedInput name="branch" placeholder="Branch" value={form.branch} onChange={handleChange} />
           </Section>
 
           {/* PRESENT ADDRESS - NOW USING MemoizedInput */}
           <Section title="Present Address">
-            <MemoizedInput name="careOf" placeholder="Care Of" value={form.careOf} onChange={handleChange} />
+            <MemoizedInput name="careOf" placeholder="C/O" value={form.careOf} onChange={handleChange} />
             <MemoizedInput name="moh" placeholder="Mohalla" value={form.moh} onChange={handleChange} />
-            <MemoizedInput name="addressPhone" placeholder="Address Phone" value={form.addressPhone} onChange={handleChange} />
+            <MemoizedInput name="addressPhone" placeholder="Phone/Mobile" value={form.addressPhone} onChange={handleChange} />
             <MemoizedInput name="houseNo" placeholder="House No" value={form.houseNo} onChange={handleChange} />
             <MemoizedInput name="roadNo" placeholder="Road No" value={form.roadNo} onChange={handleChange} />
-            <MemoizedInput name="wardNo" placeholder="Ward No" value={form.wardNo} onChange={handleChange} />
-            <MemoizedInput name="presentPo" placeholder="Present PO" value={form.presentPo} onChange={handleChange} />
-            <MemoizedInput name="presentPs" placeholder="Present PS" value={form.presentPs} onChange={handleChange} />
-            <MemoizedInput name="presentDistrict" placeholder="Present District" value={form.presentDistrict} onChange={handleChange} />
+            <MemoizedInput name="presentPo" placeholder="PO" value={form.presentPo} onChange={handleChange} />
+            <MemoizedInput name="presentPs" placeholder="PS" value={form.presentPs} onChange={handleChange} />
+            <MemoizedInput name="presentDistrict" placeholder="District" value={form.presentDistrict} onChange={handleChange} />
+            <MemoizedInput name="presentState" placeholder="State" value={form.presentState} onChange={handleChange} />
+            <MemoizedInput name="presentPinCode" placeholder="Pin Code" value={form.presentDistrict} onChange={handleChange} />
           </Section>
 
           {/* FAMILY DETAILS - NOW USING MemoizedInput */}
           <Section title="Family Details">
             <MemoizedInput name="motherName" placeholder="Mother's Name" value={form.motherName} onChange={handleChange} />
             <MemoizedInput name="motherOccupation" placeholder="Mother's Occupation" value={form.motherOccupation} onChange={handleChange} />
-            <MemoizedInput name="motherAge" placeholder="Mother's Age" value={form.motherAge} onChange={handleChange} />
+            <MemoizedInput type="date" name="motherDateOfBirth" value={form.motherDateOfBirth} onChange={handleChange} />
             <MemoizedInput name="wifeName" placeholder="Wife's Name" value={form.wifeName} onChange={handleChange} />
             <MemoizedInput name="wifeOccupation" placeholder="Wife's Occupation" value={form.wifeOccupation} onChange={handleChange} />
-            <MemoizedInput name="wifeAge" placeholder="Wife's Age" value={form.wifeAge} onChange={handleChange} />
-            <MemoizedInput name="sons" placeholder="Sons (comma-separated)" value={form.sons} onChange={handleChange} />
-            <MemoizedInput name="daughters" placeholder="Daughters (comma-separated)" value={form.daughters} onChange={handleChange} />
+            <MemoizedInput type="date" name="wifeDateOfBirth" value={form.wifeDateOfBirth} onChange={handleChange} />
+            {/* SONS */}
+              <div className="col-span-2">
+                <h4 className="font-semibold">Sons</h4>
+                {form.sons.map((son, i) => (
+                  <div key={i} className="grid grid-cols-3 gap-2">
+                    <input className="border p-2" value={son.name}
+                      onChange={e => handleChildChange("sons", i, "name", e.target.value)} />
+                    <input type="date" className="border p-2"
+                      value={son.dateOfBirth}
+                      onChange={e => handleChildChange("sons", i, "dateOfBirth", e.target.value)} />
+                    <button type="button" onClick={() => removeChild("sons", i)}>Remove</button>
+                  </div>
+                ))}
+                <button type="button" onClick={() => addChild("sons")}>+ Add Son</button>
+              </div>
+
+              {/* DAUGHTERS */}
+              <div className="col-span-2 mt-4">
+                <h4 className="font-semibold">Daughters</h4>
+                {form.daughters.map((d, i) => (
+                  <div key={i} className="grid grid-cols-3 gap-2">
+                    <input className="border p-2" value={d.name}
+                      onChange={e => handleChildChange("daughters", i, "name", e.target.value)} />
+                    <input type="date" className="border p-2"
+                      value={d.dateOfBirth}
+                      onChange={e => handleChildChange("daughters", i, "dateOfBirth", e.target.value)} />
+                    <button type="button" onClick={() => removeChild("daughters", i)}>Remove</button>
+                  </div>
+                ))}
+                <button type="button" onClick={() => addChild("daughters")}>+ Add Daughter</button>
+              </div>
           </Section>
 
           {/* OTHER DETAILS - NOW USING MemoizedInput */}
           <Section title="Other Details">
-            <MemoizedInput name="totalFee" placeholder="Total Fee" value={form.totalFee} onChange={handleChange} />
-            <MemoizedInput name="paidAmount" placeholder="Paid Amount" value={form.paidAmount} onChange={handleChange} />
-            <MemoizedInput name="balance" placeholder="Balance" value={form.balance} onChange={handleChange} />
+            <MemoizedInput name="totalFee" placeholder="Total Fee" type="number" value={form.totalFee} onChange={handleChange} />
+            <MemoizedInput name="paidAmount" placeholder="Paid Amount" type="number" value={form.paidAmount} onChange={handleChange} />
+            <MemoizedInput name="balance" placeholder="Balance" type="number" value={form.balance} readOnly />
             <MemoizedInput name="appointmentUnit" placeholder="Appointment Unit" value={form.appointmentUnit} onChange={handleChange} />
-            <MemoizedInput name="post" placeholder="Post" value={form.post} onChange={handleChange} />
+            <MemoizedSelect name="post" value={form.post} onChange={handleChange} options={POST_OPTIONS} required />
           </Section>
+            {/* ARMS GUARD EXTRA FIELDS */}
+                        {isArmsGuard && (
+                          <Section title="Arms Guard Details">
+                            <MemoizedInput name="licenseNo" placeholder="Licence No" value={form.licenseNo} onChange={handleChange} required />
+                            <MemoizedInput name="validArea" placeholder="Valid Area" value={form.validArea} onChange={handleChange} required />
+                            <MemoizedInput type="date" name="renewalUpto" placeholder="Renewal Upto" value={form.renewalUpto} onChange={handleChange} required />
+                          </Section>
+                        )}
 
           <button
             type="submit"

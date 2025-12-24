@@ -1,6 +1,45 @@
-import { useState } from "react";
+import React, { useState , memo } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
+
+export const MemoizedSelect = memo(
+  ({ name, value, onChange, options, required = false }) => {
+    const selectValue = value ?? "";
+
+    return (
+      <select
+        name={name}
+        value={selectValue}
+        onChange={onChange}
+        required={required}
+        className="border p-2 rounded bg-white"
+      >
+        <option value="">-- Select Post --</option>
+        {options.map((opt) => (
+          <option key={opt} value={opt}>
+            {opt}
+          </option>
+        ))}
+      </select>
+    );
+  }
+);
+
+const POST_OPTIONS = [
+  "S/G",
+  "H/G",
+  "S/S",
+  "Sr/S/S",
+  "S/Ins",
+  "Arms Guard",
+  "S/Officer",
+  "Labour",
+  "Helper",
+  "Civil Supervisor",
+  "Bouncer",
+  "Assistant Manager",
+];
+
 
 // Memoized input to prevent unnecessary re-renders
 const TextInput = ({ name, value, onChange, placeholder, type = "text", required = false }) => {
@@ -35,7 +74,8 @@ const initialFormState = {
   mobile: "",
   fatherName: "",
   fatherOccupation: "",
-  age: "",
+  fatherDateOfBirth: "",     // ✅ ADD
+  dateOfBirth: "",
   village: "",
   po: "",
   block: "",
@@ -66,19 +106,24 @@ const initialFormState = {
   presentPo: "",
   presentPs: "",
   presentDistrict: "",
+  presentState: "",
+  presentPinCode: "",
   motherName: "",
   motherOccupation: "",
-  motherAge: "",
+  motherDateOfBirth: "",
   wifeName: "",
   wifeOccupation: "",
-  wifeAge: "",
-  sons: "",
-  daughters: "",
+  wifeDateOfBirth: "",
+  sons: [{ name: "", dateOfBirth: "" }],
+  daughters: [{ name: "", dateOfBirth: "" }],
   totalFee: "",
   paidAmount: "",
   balance: "",
   appointmentUnit: "",
   post: "",
+  licenseNo: "",
+  validArea: "",
+  renewalUpto: "",
 };
 
 export default function RegisterEmployee() {
@@ -87,11 +132,36 @@ export default function RegisterEmployee() {
   const [photo, setPhoto] = useState(null);
   const [preview, setPreview] = useState(null);
   const [message, setMessage] = useState("");
+  const isArmsGuard = form.post === "Arms Guard";
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+
+    setForm((prev) => {
+      let updatedForm = { ...prev, [name]: value };
+
+      // Clear Arms Guard fields if post changes
+      if (name === "post" && value !== "Arms Guard") {
+        updatedForm = {
+          ...updatedForm,
+          licenseNo: "",
+          validArea: "",
+          renewalUpto: "",
+        };
+      }
+
+      // Auto-calculate balance
+      if (name === "totalFee" || name === "paidAmount") {
+        const total = Number(updatedForm.totalFee) || 0;
+        const paid = Number(updatedForm.paidAmount) || 0;
+        updatedForm.balance = total - paid;
+      }
+
+      return updatedForm;
+    });
   };
+
+
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -104,6 +174,30 @@ export default function RegisterEmployee() {
       setPreview(null);
     }
   };
+
+  const handleChildChange = (type, index, field, value) => {
+    setForm((prev) => {
+      const updated = [...prev[type]];
+      updated[index][field] = value;
+      return { ...prev, [type]: updated };
+    });
+  };
+
+  const addChild = (type) => {
+    setForm((prev) => ({
+      ...prev,
+      [type]: [...prev[type], { name: "", dateOfBirth: "" }],
+    }));
+  };
+
+  const removeChild = (type, index) => {
+    setForm((prev) => ({
+      ...prev,
+      [type]: prev[type].filter((_, i) => i !== index),
+    }));
+  };
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -152,11 +246,24 @@ export default function RegisterEmployee() {
             <TextInput name="mobile" value={form.mobile} onChange={handleChange} placeholder="Mobile No" required />
             <TextInput name="fatherName" value={form.fatherName} onChange={handleChange} placeholder="Father's Name" />
             <TextInput name="fatherOccupation" value={form.fatherOccupation} onChange={handleChange} placeholder="Father's Occupation" />
-            <TextInput name="age" value={form.age} onChange={handleChange} placeholder="Age" type="number" />
+            <TextInput
+              name="dateOfBirth"
+              value={form.dateOfBirth}
+              onChange={handleChange}
+              placeholder="Employee Date of Birth"
+              type="date"
+              required
+            />
+
+            <TextInput
+              name="fatherDateOfBirth"
+              value={form.fatherDateOfBirth}
+              onChange={handleChange}
+              placeholder="Father's Date of Birth"
+              type="date"
+            />
             <TextInput name="village" value={form.village} onChange={handleChange} placeholder="Village" />
             <TextInput name="po" value={form.po} onChange={handleChange} placeholder="Post Office" />
-            <TextInput name="block" value={form.block} onChange={handleChange} placeholder="Block" />
-            <TextInput name="subdivision" value={form.subdivision} onChange={handleChange} placeholder="Subdivision" />
             <TextInput name="district" value={form.district} onChange={handleChange} placeholder="District" />
             <TextInput name="pinCode" value={form.pinCode} onChange={handleChange} placeholder="Pin Code" />
             <TextInput name="qualification" value={form.qualification} onChange={handleChange} placeholder="Qualification" />
@@ -198,44 +305,151 @@ export default function RegisterEmployee() {
           <Section title="Bank Details">
             <TextInput name="accountHolderName" value={form.accountHolderName} onChange={handleChange} placeholder="Account Holder Name" />
             <TextInput name="bankName" value={form.bankName} onChange={handleChange} placeholder="Bank Name" />
-            <TextInput name="branchCode" value={form.branchCode} onChange={handleChange} placeholder="Branch Code" />
+            <TextInput name="branchCode" value={form.branchCode} onChange={handleChange} placeholder="IFSC Code" />
             <TextInput name="accountNo" value={form.accountNo} onChange={handleChange} placeholder="Account Number" />
             <TextInput name="branch" value={form.branch} onChange={handleChange} placeholder="Branch" />
           </Section>
 
           {/* PRESENT ADDRESS */}
           <Section title="Present Address">
-            <TextInput name="careOf" value={form.careOf} onChange={handleChange} placeholder="Care Of" />
+            <TextInput name="careOf" value={form.careOf} onChange={handleChange} placeholder="C/O" />
             <TextInput name="moh" value={form.moh} onChange={handleChange} placeholder="Mohalla" />
-            <TextInput name="addressPhone" value={form.addressPhone} onChange={handleChange} placeholder="Address Phone" />
+            <TextInput name="addressPhone" value={form.addressPhone} onChange={handleChange} placeholder="Phone/Mobile" />
             <TextInput name="houseNo" value={form.houseNo} onChange={handleChange} placeholder="House No" />
             <TextInput name="roadNo" value={form.roadNo} onChange={handleChange} placeholder="Road No" />
-            <TextInput name="wardNo" value={form.wardNo} onChange={handleChange} placeholder="Ward No" />
-            <TextInput name="presentPo" value={form.presentPo} onChange={handleChange} placeholder="Present PO" />
-            <TextInput name="presentPs" value={form.presentPs} onChange={handleChange} placeholder="Present PS" />
-            <TextInput name="presentDistrict" value={form.presentDistrict} onChange={handleChange} placeholder="Present District" />
+            <TextInput name="presentPo" value={form.presentPo} onChange={handleChange} placeholder="PO" />
+            <TextInput name="presentPs" value={form.presentPs} onChange={handleChange} placeholder="PS" />
+            <TextInput name="presentDistrict" value={form.presentDistrict} onChange={handleChange} placeholder="District" />
+            <TextInput name="presentState" value={form.presentState} onChange={handleChange} placeholder="State" />
+            <TextInput name="presentPinCode" value={form.presentPinCode} onChange={handleChange} placeholder="Pin Code" />
           </Section>
 
           {/* FAMILY DETAILS */}
           <Section title="Family Details">
             <TextInput name="motherName" value={form.motherName} onChange={handleChange} placeholder="Mother's Name" />
             <TextInput name="motherOccupation" value={form.motherOccupation} onChange={handleChange} placeholder="Mother's Occupation" />
-            <TextInput name="motherAge" value={form.motherAge} onChange={handleChange} placeholder="Mother's Age" />
+            <TextInput
+              name="motherDateOfBirth"
+              value={form.motherDateOfBirth}
+              onChange={handleChange}
+              placeholder="Mother's Date of Birth"
+              type="date"
+            />
             <TextInput name="wifeName" value={form.wifeName} onChange={handleChange} placeholder="Wife's Name" />
             <TextInput name="wifeOccupation" value={form.wifeOccupation} onChange={handleChange} placeholder="Wife's Occupation" />
-            <TextInput name="wifeAge" value={form.wifeAge} onChange={handleChange} placeholder="Wife's Age" />
-            <TextInput name="sons" value={form.sons} onChange={handleChange} placeholder="Sons (comma-separated)" />
-            <TextInput name="daughters" value={form.daughters} onChange={handleChange} placeholder="Daughters (comma-separated)" />
-          </Section>
+            <TextInput
+              name="wifeDateOfBirth"
+              value={form.wifeDateOfBirth}
+              onChange={handleChange}
+              placeholder="Wife's Date of Birth"
+              type="date"
+            />
+            <div className="col-span-2">
+              <h4 className="font-semibold mb-2">Sons</h4>
+
+              {form.sons.map((son, index) => (
+                <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-2">
+                  <input
+                    type="text"
+                    placeholder="Son Name"
+                    value={son.name}
+                    onChange={(e) =>
+                      handleChildChange("sons", index, "name", e.target.value)
+                    }
+                    className="border p-2 rounded"
+                  />
+
+                  <input
+                    type="date"
+                    value={son.dateOfBirth}
+                    onChange={(e) =>
+                      handleChildChange("sons", index, "dateOfBirth", e.target.value)
+                    }
+                    className="border p-2 rounded"
+                  />
+
+                  {form.sons.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeChild("sons", index)}
+                      className="bg-red-500 text-white rounded px-3"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+              ))}
+
+              <button
+                type="button"
+                onClick={() => addChild("sons")}
+                className="bg-blue-600 text-white px-4 py-1 rounded mt-2"
+              >
+                + Add Son
+              </button>
+            </div>
+<div className="col-span-2 mt-4">
+  <h4 className="font-semibold mb-2">Daughters</h4>
+
+  {form.daughters.map((daughter, index) => (
+    <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-2">
+      <input
+        type="text"
+        placeholder="Daughter Name"
+        value={daughter.name}
+        onChange={(e) =>
+          handleChildChange("daughters", index, "name", e.target.value)
+        }
+        className="border p-2 rounded"
+      />
+
+      <input
+        type="date"
+        value={daughter.dateOfBirth}
+        onChange={(e) =>
+          handleChildChange("daughters", index, "dateOfBirth", e.target.value)
+        }
+        className="border p-2 rounded"
+      />
+
+      {form.daughters.length > 1 && (
+        <button
+          type="button"
+          onClick={() => removeChild("daughters", index)}
+          className="bg-red-500 text-white rounded px-3"
+        >
+          Remove
+        </button>
+      )}
+    </div>
+  ))}
+
+  <button
+    type="button"
+    onClick={() => addChild("daughters")}
+    className="bg-blue-600 text-white px-4 py-1 rounded mt-2"
+  >
+    + Add Daughter
+  </button>
+</div>
+</Section>
 
           {/* OTHER DETAILS */}
           <Section title="Other Details">
-            <TextInput name="totalFee" value={form.totalFee} onChange={handleChange} placeholder="Total Fee" />
-            <TextInput name="paidAmount" value={form.paidAmount} onChange={handleChange} placeholder="Paid Amount" />
-            <TextInput name="balance" value={form.balance} onChange={handleChange} placeholder="Balance" />
+            <TextInput name="totalFee" value={form.totalFee} onChange={handleChange} placeholder="Total Fee" type="number" />
+            <TextInput name="paidAmount" value={form.paidAmount} onChange={handleChange} placeholder="Paid Amount" type="number" />
+            <TextInput name="balance" value={form.balance} onChange={handleChange} placeholder="Balance" type="number" readOnly />
             <TextInput name="appointmentUnit" value={form.appointmentUnit} onChange={handleChange} placeholder="Appointment Unit" />
-            <TextInput name="post" value={form.post} onChange={handleChange} placeholder="Post" />
+            <MemoizedSelect name="post" value={form.post} onChange={handleChange} options={POST_OPTIONS} required />
           </Section>
+            {/* ARMS GUARD EXTRA FIELDS */}
+                                    {isArmsGuard && (
+                                      <Section title="Arms Guard Details">
+                                        <MemoizedInput name="licenseNo" placeholder="Licence No" value={form.licenseNo} onChange={handleChange} required />
+                                        <MemoizedInput name="validArea" placeholder="Valid Area" value={form.validArea} onChange={handleChange} required />
+                                        <MemoizedInput type="date" name="renewalUpto" placeholder="Renewal Upto" value={form.renewalUpto} onChange={handleChange} required />
+                                      </Section>
+                                    )}
 
           <button type="submit" className="bg-green-600 hover:bg-green-700 text-white py-2 px-6 rounded w-full">
             Register Employee

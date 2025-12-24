@@ -1,5 +1,6 @@
 package com.service.security.service;
 
+import com.service.security.model.Child;
 import com.service.security.model.Employee;
 import com.service.security.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -73,7 +74,8 @@ public class EmployeeService {
         emp.setMobile(updated.getMobile());
         emp.setFatherName(updated.getFatherName());
         emp.setFatherOccupation(updated.getFatherOccupation());
-        emp.setAge(updated.getAge());
+        emp.setDateOfBirth(updated.getDateOfBirth());
+        emp.setFatherDateOfBirth(updated.getFatherDateOfBirth());
         emp.setVillage(updated.getVillage());
         emp.setPo(updated.getPo());
         emp.setBlock(updated.getBlock());
@@ -114,12 +116,32 @@ public class EmployeeService {
         // Family details
         emp.setMotherName(updated.getMotherName());
         emp.setMotherOccupation(updated.getMotherOccupation());
-        emp.setMotherAge(updated.getMotherAge());
+        emp.setMotherDateOfBirth(updated.getMotherDateOfBirth());
         emp.setWifeName(updated.getWifeName());
         emp.setWifeOccupation(updated.getWifeOccupation());
-        emp.setWifeAge(updated.getWifeAge());
-        emp.setSons(updated.getSons());
-        emp.setDaughters(updated.getDaughters());
+        emp.setWifeDateOfBirth(updated.getWifeDateOfBirth());
+        // -------- SONS --------
+        emp.getSons().clear();
+        if (updated.getSons() != null) {
+            updated.getSons().forEach(s -> {
+                Child child = new Child();
+                child.setName(s.getName());
+                child.setDateOfBirth(s.getDateOfBirth());
+                emp.getSons().add(child);
+            });
+        }
+
+// -------- DAUGHTERS --------
+        emp.getDaughters().clear();
+        if (updated.getDaughters() != null) {
+            updated.getDaughters().forEach(d -> {
+                Child child = new Child();
+                child.setName(d.getName());
+                child.setDateOfBirth(d.getDateOfBirth());
+                emp.getDaughters().add(child);
+            });
+        }
+
 
         // Fees & post details
         emp.setTotalFee(updated.getTotalFee());
@@ -127,6 +149,9 @@ public class EmployeeService {
         emp.setBalance(updated.getBalance());
         emp.setAppointmentUnit(updated.getAppointmentUnit());
         emp.setPost(updated.getPost());
+        emp.setLicenseNo(updated.getLicenseNo());
+        emp.setValidArea(updated.getValidArea());
+        emp.setRenewalUpto(updated.getRenewalUpto());
 
         return repo.save(emp);
     }
