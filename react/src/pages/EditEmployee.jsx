@@ -285,7 +285,6 @@ export default function EditEmployee() {
                                       />
             <MemoizedInput name="fatherName" placeholder="Father's Name" value={form.fatherName} onChange={handleChange} />
             <MemoizedInput name="fatherOccupation" placeholder="Father's Occupation" value={form.fatherOccupation} onChange={handleChange} />
-            <MemoizedInput name="dateOfBirth" placeholder="Date Of Birth" type="date" value={form.dateOfBirth} onChange={handleChange} />
             <MemoizedInput name="fatherDateOfBirth" placeholder="Father DOB" type="date" value={form.fatherDateOfBirth} onChange={handleChange} />
             <MemoizedInput
                                       name="fatherAadhar"

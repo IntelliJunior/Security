@@ -1,4 +1,4 @@
-import React, { useState , memo } from "react";
+import React, { useState, useEffect, memo } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 
@@ -42,20 +42,45 @@ const POST_OPTIONS = [
 
 
 // Memoized input to prevent unnecessary re-renders
-const TextInput = ({ name, value, onChange, placeholder, type = "text", required = false }) => {
+
+
+const TextInput = ({
+  name,
+  value,
+  onChange,
+  placeholder,
+  type = "text",
+  required = false,
+}) => {
+  const isDate = type === "date";
+  const [inputType, setInputType] = useState(isDate && value ? "date" : "text");
+
+  useEffect(() => {
+    if (isDate && value) {
+      setInputType("date");
+    }
+  }, [value, isDate]);
+
   return (
     <input
-      type={type}
+      type={inputType}
       name={name}
-      value={value}
+      value={value || ""}
       onChange={onChange}
-      placeholder={placeholder}
-      className="border p-2 rounded w-full"
+      placeholder={inputType === "text" ? placeholder : ""}
       required={required}
+      className="border p-2 rounded w-full"
       autoComplete="off"
+      onFocus={() => isDate && setInputType("date")}
+      onBlur={() => {
+        if (isDate && !value) {
+          setInputType("text");
+        }
+      }}
     />
   );
 };
+
 
 // Section component
 const Section = ({ title, children }) => (
@@ -413,8 +438,9 @@ export default function RegisterEmployee() {
                     className="border p-2 rounded"
                   />
 
-                  <input
+                  <TextInput
                     type="date"
+                    placeholder="Son's Date of Birth"
                     value={son.dateOfBirth}
                     onChange={(e) =>
                       handleChildChange("sons", index, "dateOfBirth", e.target.value)
@@ -467,8 +493,9 @@ export default function RegisterEmployee() {
         className="border p-2 rounded"
       />
 
-      <input
+      <TextInput
         type="date"
+        placeholder="Daughter's Date of Birth"
         value={daughter.dateOfBirth}
         onChange={(e) =>
           handleChildChange("daughters", index, "dateOfBirth", e.target.value)
