@@ -53,10 +53,28 @@ public class EmployeePdfService {
 
             // ======= TITLE =======
             // ======= TITLE WITH DATE OF JOINING =======
-            PdfPTable titleTable = new PdfPTable(2);
+            PdfPTable titleTable = new PdfPTable(3);
             titleTable.setWidthPercentage(100);
+            titleTable.setWidths(new float[]{30, 40, 30});
             titleTable.setSpacingBefore(10);
-            titleTable.setWidths(new float[]{70, 30});
+            titleTable.setSpacingAfter(10);
+
+            // ---- Left: Registration Form ----
+            String regForm = emp.getDate() != null
+                    ? formatDate(emp.getDate()) + "/NNSS/" +
+                    emp.getPresentState() + "/" +
+                    emp.getPresentDistrict() + "/" +
+                    emp.getId()
+                    : "";
+
+            PdfPCell regCell = new PdfPCell(
+                    new Paragraph("Reg. Form: " + regForm, valueFont)
+            );
+            regCell.setBorder(Rectangle.NO_BORDER);
+            regCell.setHorizontalAlignment(Element.ALIGN_LEFT);
+            regCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+
+
 
 // ---- Left: Title ----
             PdfPCell titleCell = new PdfPCell(
@@ -66,7 +84,7 @@ public class EmployeePdfService {
             titleCell.setHorizontalAlignment(Element.ALIGN_CENTER);
             titleCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
 
-// ---- Right: Date of Joining ----
+            // ---- Right: Date of Joining ----
             String doj = emp.getDate() != null
                     ? formatDate(emp.getDate())
                     : "";
@@ -79,14 +97,20 @@ public class EmployeePdfService {
             dojCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
             dojCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
 
-// Add cells
-            titleTable.addCell(titleCell);
-            titleTable.addCell(dojCell);
+            regCell.setNoWrap(true);
+            dojCell.setNoWrap(true);
 
-// Spacing
-            titleTable.setSpacingAfter(10);
 
-// Add to document
+            // Add cells
+            titleTable.addCell(regCell);    // LEFT
+            titleTable.addCell(titleCell);  // CENTER
+            titleTable.addCell(dojCell);    // RIGHT
+
+
+            // Spacing
+            //titleTable.setSpacingAfter(10);
+
+            // Add to document
             document.add(titleTable);
 
 
@@ -177,7 +201,7 @@ public class EmployeePdfService {
             addRow(presentAddressTable, "C/O", emp.getCareOf(), "Mohalla", emp.getMoh(), labelFont, valueFont);
             addRow(presentAddressTable, "Phone/Mobile", emp.getAddressPhone(), "House No", emp.getHouseNo(), labelFont, valueFont);
             addRow(presentAddressTable, "Road No", emp.getRoadNo(), "PO", emp.getPresentPo(), labelFont, valueFont);
-            addRow(presentAddressTable, "PS", emp.getRoadNo(), "District", emp.getPresentDistrict(), labelFont, valueFont);
+            addRow(presentAddressTable, "PS", emp.getPresentPs(), "District", emp.getPresentDistrict(), labelFont, valueFont);
             addRow(presentAddressTable, "State", emp.getPresentState(), "Pin Code", emp.getPresentPinCode(), labelFont, valueFont);
             document.add(presentAddressTable);
             //document.add(Chunk.NEWLINE);
