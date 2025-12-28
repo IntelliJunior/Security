@@ -5,6 +5,8 @@ import java.time.LocalDate;
 public class ChildDto {
     private String name;
     private LocalDate dateOfBirth;
+    private String aadhar;
+
 
     public LocalDate getDateOfBirth() {
         return dateOfBirth;
@@ -20,6 +22,14 @@ public class ChildDto {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getAadhar() {
+        return aadhar;
+    }
+
+    public void setAadhar(String aadhar) {
+        this.aadhar = aadhar;
     }
 }
 

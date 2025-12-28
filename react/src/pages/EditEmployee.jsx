@@ -120,8 +120,8 @@ export default function EditEmployee() {
     wifeName: "",
     wifeOccupation: "",
     wifeDateOfBirth: "",
-    sons: [],
-    daughters: [],
+    sons: [{ name: "", dateOfBirth: "", aadhar: "" }],
+    daughters: [{ name: "", dateOfBirth: "", aadhar: "" }],
     totalFee: "",
     paidAmount: "",
     balance: "",
@@ -130,6 +130,18 @@ export default function EditEmployee() {
     licenseNo: "",
     validArea: "",
     renewalUpto: "",
+
+     // ===== Employee IDs =====
+      employeeAadhar: "",
+      employeeUan: "",
+      employeeInsuranceNo: "",
+      employeePfNo: "",
+
+      // ===== Family Aadhar =====
+      fatherAadhar: "",
+      motherAadhar: "",
+      wifeAadhar: "",
+
   };
 
   const [form, setForm] = useState(initialFormState);
@@ -238,9 +250,49 @@ export default function EditEmployee() {
             <MemoizedInput name="date" placeholder="Date" type="date" value={form.date} onChange={handleChange} />
             <MemoizedInput name="name" placeholder="Full Name" value={form.name} onChange={handleChange} required={true} />
             <MemoizedInput name="mobile" placeholder="Mobile No" value={form.mobile} onChange={handleChange} required={true} />
+            <MemoizedInput
+                                      name="dateOfBirth"
+                                      value={form.dateOfBirth}
+                                      onChange={handleChange}
+                                      placeholder="Employee Date of Birth"
+                                      type="date"
+                                      required
+                                    />
+
+                                    <MemoizedInput
+                                        name="employeeAadhar"
+                                        value={form.employeeAadhar}
+                                        onChange={handleChange}
+                                        placeholder="Employee Aadhar Number"
+                                      />
+                                      <MemoizedInput
+                                        name="employeeUan"
+                                        value={form.employeeUan}
+                                        onChange={handleChange}
+                                        placeholder="Employee UAN Number"
+                                      />
+                                      <MemoizedInput
+                                        name="employeeInsuranceNo"
+                                        value={form.employeeInsuranceNo}
+                                        onChange={handleChange}
+                                        placeholder="Employee Insurance Number"
+                                      />
+                                      <MemoizedInput
+                                        name="employeePfNo"
+                                        value={form.employeePfNo}
+                                        onChange={handleChange}
+                                        placeholder="Employee PF Number"
+                                      />
             <MemoizedInput name="fatherName" placeholder="Father's Name" value={form.fatherName} onChange={handleChange} />
             <MemoizedInput name="fatherOccupation" placeholder="Father's Occupation" value={form.fatherOccupation} onChange={handleChange} />
-            <MemoizedInput name="age" placeholder="Age" type="number" value={form.age} onChange={handleChange} />
+            <MemoizedInput name="dateOfBirth" placeholder="Date Of Birth" type="date" value={form.dateOfBirth} onChange={handleChange} />
+            <MemoizedInput name="fatherDateOfBirth" placeholder="Father DOB" type="date" value={form.fatherDateOfBirth} onChange={handleChange} />
+            <MemoizedInput
+                                      name="fatherAadhar"
+                                      value={form.fatherAadhar}
+                                      onChange={handleChange}
+                                      placeholder="Father Aadhar Number"
+                        />
             <MemoizedInput name="village" placeholder="Village" value={form.village} onChange={handleChange} />
             <MemoizedInput name="po" placeholder="Post Office" value={form.po} onChange={handleChange} />
             <MemoizedInput name="district" placeholder="District" value={form.district} onChange={handleChange} />
@@ -281,49 +333,168 @@ export default function EditEmployee() {
             <MemoizedInput name="presentPs" placeholder="PS" value={form.presentPs} onChange={handleChange} />
             <MemoizedInput name="presentDistrict" placeholder="District" value={form.presentDistrict} onChange={handleChange} />
             <MemoizedInput name="presentState" placeholder="State" value={form.presentState} onChange={handleChange} />
-            <MemoizedInput name="presentPinCode" placeholder="Pin Code" value={form.presentDistrict} onChange={handleChange} />
+            <MemoizedInput name="presentPinCode" placeholder="Pin Code" value={form.presentPinCode} onChange={handleChange} />
           </Section>
 
           {/* FAMILY DETAILS - NOW USING MemoizedInput */}
+          {/* FAMILY DETAILS */}
           <Section title="Family Details">
-            <MemoizedInput name="motherName" placeholder="Mother's Name" value={form.motherName} onChange={handleChange} />
-            <MemoizedInput name="motherOccupation" placeholder="Mother's Occupation" value={form.motherOccupation} onChange={handleChange} />
-            <MemoizedInput type="date" name="motherDateOfBirth" value={form.motherDateOfBirth} onChange={handleChange} />
-            <MemoizedInput name="wifeName" placeholder="Wife's Name" value={form.wifeName} onChange={handleChange} />
-            <MemoizedInput name="wifeOccupation" placeholder="Wife's Occupation" value={form.wifeOccupation} onChange={handleChange} />
-            <MemoizedInput type="date" name="wifeDateOfBirth" value={form.wifeDateOfBirth} onChange={handleChange} />
-            {/* SONS */}
-              <div className="col-span-2">
-                <h4 className="font-semibold">Sons</h4>
-                {form.sons.map((son, i) => (
-                  <div key={i} className="grid grid-cols-3 gap-2">
-                    <input className="border p-2" value={son.name}
-                      onChange={e => handleChildChange("sons", i, "name", e.target.value)} />
-                    <input type="date" className="border p-2"
-                      value={son.dateOfBirth}
-                      onChange={e => handleChildChange("sons", i, "dateOfBirth", e.target.value)} />
-                    <button type="button" onClick={() => removeChild("sons", i)}>Remove</button>
-                  </div>
-                ))}
-                <button type="button" onClick={() => addChild("sons")}>+ Add Son</button>
-              </div>
+            <MemoizedInput
+              name="motherName"
+              placeholder="Mother's Name"
+              value={form.motherName}
+              onChange={handleChange}
+            />
+            <MemoizedInput
+              name="motherOccupation"
+              placeholder="Mother's Occupation"
+              value={form.motherOccupation}
+              onChange={handleChange}
+            />
+            <MemoizedInput
+              type="date"
+              name="motherDateOfBirth"
+              value={form.motherDateOfBirth}
+              onChange={handleChange}
+            />
 
-              {/* DAUGHTERS */}
-              <div className="col-span-2 mt-4">
-                <h4 className="font-semibold">Daughters</h4>
-                {form.daughters.map((d, i) => (
-                  <div key={i} className="grid grid-cols-3 gap-2">
-                    <input className="border p-2" value={d.name}
-                      onChange={e => handleChildChange("daughters", i, "name", e.target.value)} />
-                    <input type="date" className="border p-2"
-                      value={d.dateOfBirth}
-                      onChange={e => handleChildChange("daughters", i, "dateOfBirth", e.target.value)} />
-                    <button type="button" onClick={() => removeChild("daughters", i)}>Remove</button>
-                  </div>
-                ))}
-                <button type="button" onClick={() => addChild("daughters")}>+ Add Daughter</button>
-              </div>
+            <MemoizedInput
+                          name="motherAadhar"
+                          value={form.motherAadhar}
+                          onChange={handleChange}
+                          placeholder="Mother Aadhar Number"
+                        />
+
+            <MemoizedInput
+              name="wifeName"
+              placeholder="Wife's Name"
+              value={form.wifeName}
+              onChange={handleChange}
+            />
+            <MemoizedInput
+              name="wifeOccupation"
+              placeholder="Wife's Occupation"
+              value={form.wifeOccupation}
+              onChange={handleChange}
+            />
+            <MemoizedInput
+              type="date"
+              name="wifeDateOfBirth"
+              value={form.wifeDateOfBirth}
+              onChange={handleChange}
+            />
+
+            <MemoizedInput
+                          name="wifeAadhar"
+                          value={form.wifeAadhar}
+                          onChange={handleChange}
+                          placeholder="Wife Aadhar Number"
+                        />
+
+            {/* SONS */}
+            <div className="col-span-2">
+              <h4 className="font-semibold text-gray-800">Sons</h4>
+
+              {form.sons.map((son, i) => (
+                <div key={i} className="grid grid-cols-3 gap-2 mb-2">
+                  <input
+                    className="border p-2 text-black"
+                    value={son.name}
+                    onChange={(e) =>
+                      handleChildChange("sons", i, "name", e.target.value)
+                    }
+                  />
+                  <input
+                    type="date"
+                    className="border p-2 text-black"
+                    value={son.dateOfBirth}
+                    onChange={(e) =>
+                      handleChildChange("sons", i, "dateOfBirth", e.target.value)
+                    }
+                  />
+                  <input
+                    type="text"
+                    placeholder="Son Aadhar Number"
+                    value={son.aadhar || ""}
+                    onChange={(e) =>
+                      handleChildChange("sons", i, "aadhar", e.target.value)
+                    }
+                    className="border p-2 rounded"
+                  />
+                  <button
+                    type="button"
+                    className="text-red-600"
+                    onClick={() => removeChild("sons", i)}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+
+              <button
+                type="button"
+                className="text-blue-600 mt-2"
+                onClick={() => addChild("sons")}
+              >
+                + Add Son
+              </button>
+            </div>
+
+            {/* DAUGHTERS */}
+            <div className="col-span-2 mt-4">
+              <h4 className="font-semibold text-gray-800">Daughters</h4>
+
+              {form.daughters.map((daughter, i) => (
+                <div key={i} className="grid grid-cols-3 gap-2 mb-2">
+                  <input
+                    className="border p-2 text-black"
+                    value={daughter.name}
+                    onChange={(e) =>
+                      handleChildChange("daughters", i, "name", e.target.value)
+                    }
+                  />
+
+                  <input
+                    type="date"
+                    className="border p-2 text-black"
+                    value={daughter.dateOfBirth}
+                    onChange={(e) =>
+                      handleChildChange("daughters", i, "dateOfBirth", e.target.value)
+                    }
+                  />
+
+                  <input
+                    type="text"
+                    placeholder="Daughter Aadhar Number"
+                    value={daughter.aadhar || ""}
+                    onChange={(e) =>
+                      handleChildChange("daughters", i, "aadhar", e.target.value)
+                    }
+                    className="border p-2 rounded"
+                  />
+
+                  <button
+                    type="button"
+                    className="text-red-600"
+                    onClick={() => removeChild("daughters", i)}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+
+
+              <button
+                type="button"
+                className="text-blue-600 mt-2"
+                onClick={() => addChild("daughters")}
+              >
+                + Add Daughter
+              </button>
+            </div>
           </Section>
+
+
 
           {/* OTHER DETAILS - NOW USING MemoizedInput */}
           <Section title="Other Details">

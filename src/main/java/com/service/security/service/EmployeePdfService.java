@@ -31,10 +31,10 @@ public class EmployeePdfService {
             document.open();
 
             // ======= FONTS =======
-            Font titleFont = new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD, BaseColor.BLUE);
-            Font subTitleFont = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
-            Font labelFont = new Font(Font.FontFamily.HELVETICA, 9, Font.BOLD);
-            Font valueFont = new Font(Font.FontFamily.HELVETICA, 9);
+            Font titleFont = new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD, BaseColor.BLUE);
+            Font subTitleFont = new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD);
+            Font labelFont = new Font(Font.FontFamily.HELVETICA, 8, Font.BOLD);
+            Font valueFont = new Font(Font.FontFamily.HELVETICA, 8);
 
             // ======= HEADER =======
             Paragraph companyName = new Paragraph("NEW NATIONAL SECURITY SERVICES", titleFont);
@@ -108,6 +108,8 @@ public class EmployeePdfService {
             basicTable.getDefaultCell().setBorder(Rectangle.NO_BORDER);
             addRow(basicTable, "Through", emp.getThrough(), "Phone No", emp.getPhoneNo(), labelFont, valueFont);
             addRow(basicTable, "Name", emp.getName(), "Mobile", emp.getMobile(), labelFont, valueFont);
+            addRow(basicTable, "Employee Aadhar", emp.getEmployeeAadhar(), "Employee UAN Number", emp.getEmployeeUan(), labelFont, valueFont);
+            addRow(basicTable, "Employee Insurance Number", emp.getEmployeeInsuranceNo(), "Employee PF Number", emp.getEmployeePfNo(), labelFont, valueFont);
             addRow(basicTable, "Date of Birth", emp.getDateOfBirth() != null ? formatDate(emp.getDateOfBirth()) : "", "Village", emp.getVillage(), labelFont, valueFont);
             addRow(basicTable, "District", emp.getDistrict(), "Pin Code", emp.getPinCode(), labelFont, valueFont);
             addRow(basicTable, "Qualification", emp.getQualification(), "Nearest Railway Station", emp.getNearestRailwayStation(), labelFont, valueFont);
@@ -162,7 +164,7 @@ public class EmployeePdfService {
             bankTable.setWidthPercentage(100);
             bankTable.getDefaultCell().setBorder(Rectangle.NO_BORDER);
             addRow(bankTable, "Account Holder", emp.getAccountHolderName(), "Bank Name", emp.getBankName(), labelFont, valueFont);
-            addRow(bankTable, "Branch", emp.getBranch(), "Branch Code", emp.getBranchCode(), labelFont, valueFont);
+            addRow(bankTable, "Branch", emp.getBranch(), "IFSC Code", emp.getBranchCode(), labelFont, valueFont);
             addRow(bankTable, "Account No", emp.getAccountNo(), "", "", labelFont, valueFont);
             document.add(bankTable);
             //document.add(Chunk.NEWLINE);
@@ -183,7 +185,7 @@ public class EmployeePdfService {
             // ======= FAMILY DETAILS =======
             addSectionHeader(document, "Family Details", subTitleFont);
 
-            PdfPTable familyTable = new PdfPTable(6);
+            PdfPTable familyTable = new PdfPTable(8);
             familyTable.setWidthPercentage(100);
             familyTable.getDefaultCell().setBorder(Rectangle.NO_BORDER);
 
@@ -193,6 +195,7 @@ public class EmployeePdfService {
                     "Father's Name", emp.getFatherName(),
                     "Father's DOB", formatDate(emp.getFatherDateOfBirth()),
                     "Occupation", emp.getFatherOccupation(),
+                    "Aadhar", emp.getFatherAadhar(),
                     labelFont, valueFont
             );
 
@@ -202,6 +205,7 @@ public class EmployeePdfService {
                     "Mother's Name", emp.getMotherName(),
                     "Mother's DOB", formatDate(emp.getMotherDateOfBirth()),
                     "Occupation", emp.getMotherOccupation(),
+                    "Aadhar", emp.getMotherAadhar(),
                     labelFont, valueFont
             );
 
@@ -211,6 +215,7 @@ public class EmployeePdfService {
                     "Wife's Name", emp.getWifeName(),
                     "Wife's DOB", formatDate(emp.getWifeDateOfBirth()),
                     "Occupation", emp.getWifeOccupation(),
+                    "Aadhar", emp.getWifeAadhar(),
                     labelFont, valueFont
             );
             document.add(familyTable);
@@ -261,7 +266,7 @@ public class EmployeePdfService {
 
             Paragraph signature = new Paragraph(
                     "Applicant Signature: ___________________     Date: ____________\n\n" +
-                            "Office Incharge Signature: _______________     Date: ____________             Proprietor / Authorized Signature", valueFont);
+                            "Office Incharge Signature: _______________     Date: ____________                            Proprietor / Authorized Signature", valueFont);
             signature.setSpacingBefore(10);
             document.add(signature);
 
@@ -294,9 +299,11 @@ public class EmployeePdfService {
         StringBuilder sb = new StringBuilder();
         for (Child c : children) {
             sb.append(c.getName())
-                    .append(" (DOB: ")
-                    .append(c.getDateOfBirth())
-                    .append(")\n");
+                    .append(" | DOB: ")
+                    .append(formatDate(c.getDateOfBirth()))
+                    .append(" | Aadhaar: ")
+                    .append(c.getAadhar() != null ? c.getAadhar() : "—")
+                    .append("\n");
         }
         return sb.toString();
     }
@@ -306,6 +313,7 @@ public class EmployeePdfService {
             String label1, Object value1,
             String label2, Object value2,
             String label3, Object value3,
+            String label4, Object value4,
             Font labelFont, Font valueFont
     ) {
         table.addCell(new Phrase(label1 + ":", labelFont));
@@ -316,6 +324,9 @@ public class EmployeePdfService {
 
         table.addCell(new Phrase(label3 + ":", labelFont));
         table.addCell(new Phrase(value3 != null ? value3.toString() : "", valueFont));
+
+        table.addCell(new Phrase(label4 + ":", labelFont));
+        table.addCell(new Phrase(value4 != null ? value4.toString() : "", valueFont));
     }
 
     private String formatDate(LocalDate date) {

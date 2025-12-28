@@ -79,9 +79,14 @@ export default function EmployeeDetails() {
             <Item label="Name" value={employee.name} />
             <Item label="Date Of Joining" value={employee.date} />
             <Item label="Mobile" value={employee.mobile} />
-            <Item label="Father's Name" value={employee.fatherName} />
             <Item label="Date of Birth" value={employee.dateOfBirth} />
+            <Item label="Employee Aadhar Number" value={employee.employeeAadhar} />
+            <Item label="Employee UAN Number" value={employee.employeeUan} />
+            <Item label="Employee Insurance Number" value={employee.employeeInsuranceNo} />
+            <Item label="Employee PF Number" value={employee.employeePfNo} />
+            <Item label="Father's Name" value={employee.fatherName} />
             <Item label="Father DOB" value={employee.fatherDateOfBirth} />
+            <Item label="Father's Aadhar Number" value={employee.fatherAadhar} />
             <Item label="District" value={employee.district} />
             <Item label="Village" value={employee.village} />
             <Item label="Post Office" value={employee.po} />
@@ -133,9 +138,11 @@ export default function EmployeeDetails() {
             <Item label="Mother's Name" value={employee.motherName} />
             <Item label="Mother's Occupation" value={employee.motherOccupation} />
             <Item label="Mother DOB" value={employee.motherDateOfBirth} />
+            <Item label="Mother Aadhar Number" value={employee.motherAadhar} />
             <Item label="Wife's Name" value={employee.wifeName} />
             <Item label="Wife's Occupation" value={employee.wifeOccupation} />
             <Item label="Wife DOB" value={employee.wifeDateOfBirth} />
+            <Item label="Wife Aadhar Number" value={employee.wifeAadhar} />
 
             <div className="col-span-2">
               <strong>Sons:</strong>
@@ -143,7 +150,7 @@ export default function EmployeeDetails() {
                 {employee.sons?.length
                   ? employee.sons.map((s, i) => (
                       <li key={i}>
-                        {s.name} (DOB: {s.dateOfBirth})
+                        {s.name} (DOB: {s.dateOfBirth})(Aadhar: {s.aadhar})
                       </li>
                     ))
                   : " N/A"}
@@ -156,7 +163,7 @@ export default function EmployeeDetails() {
                 {employee.daughters?.length
                   ? employee.daughters.map((d, i) => (
                       <li key={i}>
-                        {d.name} (DOB: {d.dateOfBirth})
+                        {d.name} (DOB: {d.dateOfBirth})(Aadhar: {d.aadhar})
                       </li>
                     ))
                   : " N/A"}

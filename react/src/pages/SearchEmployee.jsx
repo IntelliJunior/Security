@@ -49,6 +49,9 @@ export default function SearchEmployee() {
             <option value="name">Name</option>
             <option value="mobile">Mobile</option>
             <option value="fatherName">Father Name</option>
+            <option value="village">Village</option>
+            <option value="district">District</option>
+            <option value="through">Reference</option>
           </select>
 
           <input
@@ -76,7 +79,9 @@ export default function SearchEmployee() {
                 <th className="py-2 px-4 border">Name</th>
                 <th className="py-2 px-4 border">Mobile</th>
                 <th className="py-2 px-4 border">Father Name</th>
-                <th className="py-2 px-4 border">District</th>
+                <th className="py-2 px-4 border">district</th>
+                <th className="py-2 px-4 border">village</th>
+                <th className="py-2 px-4 border">through</th>
                 <th className="py-2 px-4 border">Actions</th>
               </tr>
             </thead>
@@ -87,6 +92,8 @@ export default function SearchEmployee() {
                   <td className="py-2 px-4 border">{emp.mobile}</td>
                   <td className="py-2 px-4 border">{emp.fatherName}</td>
                   <td className="py-2 px-4 border">{emp.district}</td>
+                  <td className="py-2 px-4 border">{emp.village}</td>
+                  <td className="py-2 px-4 border">{emp.through}</td>
                   <td className="py-2 px-4 border">
                     <button
                       onClick={() => navigate(`/dashboard/details/${emp.id}`)}

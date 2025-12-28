@@ -72,14 +72,17 @@ public class EmployeeService {
         emp.setDate(updated.getDate());
         emp.setName(updated.getName());
         emp.setMobile(updated.getMobile());
+        emp.setEmployeeAadhar(updated.getEmployeeAadhar());
+        emp.setEmployeeUan(updated.getEmployeeUan());
+        emp.setEmployeeInsuranceNo(updated.getEmployeeInsuranceNo());
+        emp.setEmployeePfNo(updated.getEmployeePfNo());
+        emp.setDateOfBirth(updated.getDateOfBirth());
         emp.setFatherName(updated.getFatherName());
         emp.setFatherOccupation(updated.getFatherOccupation());
-        emp.setDateOfBirth(updated.getDateOfBirth());
         emp.setFatherDateOfBirth(updated.getFatherDateOfBirth());
+        emp.setFatherAadhar(updated.getFatherAadhar());
         emp.setVillage(updated.getVillage());
         emp.setPo(updated.getPo());
-        emp.setBlock(updated.getBlock());
-        emp.setSubdivision(updated.getSubdivision());
         emp.setDistrict(updated.getDistrict());
         emp.setPinCode(updated.getPinCode());
         emp.setQualification(updated.getQualification());
@@ -108,7 +111,6 @@ public class EmployeeService {
         emp.setAddressPhone(updated.getAddressPhone());
         emp.setHouseNo(updated.getHouseNo());
         emp.setRoadNo(updated.getRoadNo());
-        emp.setWardNo(updated.getWardNo());
         emp.setPresentPo(updated.getPresentPo());
         emp.setPresentPs(updated.getPresentPs());
         emp.setPresentDistrict(updated.getPresentDistrict());
@@ -117,9 +119,11 @@ public class EmployeeService {
         emp.setMotherName(updated.getMotherName());
         emp.setMotherOccupation(updated.getMotherOccupation());
         emp.setMotherDateOfBirth(updated.getMotherDateOfBirth());
+        emp.setMotherAadhar(updated.getMotherAadhar());
         emp.setWifeName(updated.getWifeName());
         emp.setWifeOccupation(updated.getWifeOccupation());
         emp.setWifeDateOfBirth(updated.getWifeDateOfBirth());
+        emp.setWifeAadhar(updated.getWifeAadhar());
         // -------- SONS --------
         emp.getSons().clear();
         if (updated.getSons() != null) {
@@ -127,6 +131,7 @@ public class EmployeeService {
                 Child child = new Child();
                 child.setName(s.getName());
                 child.setDateOfBirth(s.getDateOfBirth());
+                child.setAadhar(s.getAadhar());
                 emp.getSons().add(child);
             });
         }
@@ -138,6 +143,7 @@ public class EmployeeService {
                 Child child = new Child();
                 child.setName(d.getName());
                 child.setDateOfBirth(d.getDateOfBirth());
+                child.setAadhar(d.getAadhar());
                 emp.getDaughters().add(child);
             });
         }
@@ -164,13 +170,19 @@ public class EmployeeService {
         repo.deleteById(id);
     }
 
-    public List<Employee> searchEmployees(String name, String mobile, String fatherName) {
+    public List<Employee> searchEmployees(String name, String mobile, String fatherName, String district, String village, String through) {
         if (name != null && !name.isBlank()) {
-            return repo.searchEmployees(name, mobile, fatherName);
+            return repo.searchEmployees(name, mobile, fatherName, district, village, through);
         } else if (mobile != null && !mobile.isBlank()) {
-            return repo.searchEmployees(name, mobile, fatherName);
+            return repo.searchEmployees(name, mobile, fatherName, district, village, through);
         } else if (fatherName != null && !fatherName.isBlank()) {
-            return repo.searchEmployees(name, mobile, fatherName);
+            return repo.searchEmployees(name, mobile, fatherName, district, village, through);
+        }else if (district != null && !district.isBlank()) {
+            return repo.searchEmployees(name, mobile, fatherName, district, village, through);
+        }else if (village != null && !village.isBlank()) {
+            return repo.searchEmployees(name, mobile, fatherName, district, village, through);
+        }else if (through != null && !through.isBlank()) {
+            return repo.searchEmployees(name, mobile, fatherName, district, village, through);
         } else {
             return List.of(); // empty list when nothing searched
         }

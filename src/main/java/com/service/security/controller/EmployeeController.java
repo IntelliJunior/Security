@@ -21,7 +21,11 @@ public class EmployeeController {
     public List<Employee> searchEmployees(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String mobile,
-            @RequestParam(required = false) String fatherName) {
-        return service.searchEmployees(name, mobile, fatherName);
+            @RequestParam(required = false) String fatherName,
+            @RequestParam(required = false) String district,
+            @RequestParam(required = false) String village,
+            @RequestParam(required = false) String through
+    ) {
+        return service.searchEmployees(name, mobile, fatherName, district, village, through);
     }
 }

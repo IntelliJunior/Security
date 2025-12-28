@@ -8,6 +8,8 @@ public class Child {
 
     private String name;
     private LocalDate dateOfBirth;
+    private String aadhar;
+
 
     public String getName() {
         return name;
@@ -23,5 +25,13 @@ public class Child {
 
     public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
+    }
+
+    public String getAadhar() {
+        return aadhar;
+    }
+
+    public void setAadhar(String aadhar) {
+        this.aadhar = aadhar;
     }
 }

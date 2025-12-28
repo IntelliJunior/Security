@@ -114,8 +114,8 @@ const initialFormState = {
   wifeName: "",
   wifeOccupation: "",
   wifeDateOfBirth: "",
-  sons: [{ name: "", dateOfBirth: "" }],
-  daughters: [{ name: "", dateOfBirth: "" }],
+  sons: [{ name: "", dateOfBirth: "", aadhar: "" }],
+  daughters: [{ name: "", dateOfBirth: "", aadhar: "" }],
   totalFee: "",
   paidAmount: "",
   balance: "",
@@ -124,6 +124,17 @@ const initialFormState = {
   licenseNo: "",
   validArea: "",
   renewalUpto: "",
+
+   // ===== Employee IDs =====
+    employeeAadhar: "",
+    employeeUan: "",
+    employeeInsuranceNo: "",
+    employeePfNo: "",
+
+    // ===== Family Aadhar =====
+    fatherAadhar: "",
+    motherAadhar: "",
+    wifeAadhar: "",
 };
 
 export default function RegisterEmployee() {
@@ -244,23 +255,53 @@ export default function RegisterEmployee() {
             <TextInput name="date" value={form.date} onChange={handleChange} placeholder="Date" type="date" />
             <TextInput name="name" value={form.name} onChange={handleChange} placeholder="Full Name" required />
             <TextInput name="mobile" value={form.mobile} onChange={handleChange} placeholder="Mobile No" required />
+            <TextInput
+                          name="dateOfBirth"
+                          value={form.dateOfBirth}
+                          onChange={handleChange}
+                          placeholder="Employee Date of Birth"
+                          type="date"
+                          required
+                        />
+
+                        <TextInput
+                            name="employeeAadhar"
+                            value={form.employeeAadhar}
+                            onChange={handleChange}
+                            placeholder="Employee Aadhar Number"
+                          />
+                          <TextInput
+                            name="employeeUan"
+                            value={form.employeeUan}
+                            onChange={handleChange}
+                            placeholder="Employee UAN Number"
+                          />
+                          <TextInput
+                            name="employeeInsuranceNo"
+                            value={form.employeeInsuranceNo}
+                            onChange={handleChange}
+                            placeholder="Employee Insurance Number"
+                          />
+                          <TextInput
+                            name="employeePfNo"
+                            value={form.employeePfNo}
+                            onChange={handleChange}
+                            placeholder="Employee PF Number"
+                          />
             <TextInput name="fatherName" value={form.fatherName} onChange={handleChange} placeholder="Father's Name" />
             <TextInput name="fatherOccupation" value={form.fatherOccupation} onChange={handleChange} placeholder="Father's Occupation" />
-            <TextInput
-              name="dateOfBirth"
-              value={form.dateOfBirth}
-              onChange={handleChange}
-              placeholder="Employee Date of Birth"
-              type="date"
-              required
-            />
-
             <TextInput
               name="fatherDateOfBirth"
               value={form.fatherDateOfBirth}
               onChange={handleChange}
               placeholder="Father's Date of Birth"
               type="date"
+            />
+            <TextInput
+                          name="fatherAadhar"
+                          value={form.fatherAadhar}
+                          onChange={handleChange}
+                          placeholder="Father Aadhar Number"
             />
             <TextInput name="village" value={form.village} onChange={handleChange} placeholder="Village" />
             <TextInput name="po" value={form.po} onChange={handleChange} placeholder="Post Office" />
@@ -335,6 +376,12 @@ export default function RegisterEmployee() {
               placeholder="Mother's Date of Birth"
               type="date"
             />
+            <TextInput
+              name="motherAadhar"
+              value={form.motherAadhar}
+              onChange={handleChange}
+              placeholder="Mother Aadhar Number"
+            />
             <TextInput name="wifeName" value={form.wifeName} onChange={handleChange} placeholder="Wife's Name" />
             <TextInput name="wifeOccupation" value={form.wifeOccupation} onChange={handleChange} placeholder="Wife's Occupation" />
             <TextInput
@@ -343,6 +390,13 @@ export default function RegisterEmployee() {
               onChange={handleChange}
               placeholder="Wife's Date of Birth"
               type="date"
+            />
+
+            <TextInput
+              name="wifeAadhar"
+              value={form.wifeAadhar}
+              onChange={handleChange}
+              placeholder="Wife Aadhar Number"
             />
             <div className="col-span-2">
               <h4 className="font-semibold mb-2">Sons</h4>
@@ -364,6 +418,16 @@ export default function RegisterEmployee() {
                     value={son.dateOfBirth}
                     onChange={(e) =>
                       handleChildChange("sons", index, "dateOfBirth", e.target.value)
+                    }
+                    className="border p-2 rounded"
+                  />
+
+                  <input
+                    type="text"
+                    placeholder="Son Aadhar Number"
+                    value={son.aadhar}
+                    onChange={(e) =>
+                      handleChildChange("sons", index, "aadhar", e.target.value)
                     }
                     className="border p-2 rounded"
                   />
@@ -408,6 +472,16 @@ export default function RegisterEmployee() {
         value={daughter.dateOfBirth}
         onChange={(e) =>
           handleChildChange("daughters", index, "dateOfBirth", e.target.value)
+        }
+        className="border p-2 rounded"
+      />
+
+      <input
+        type="text"
+        placeholder="Daughter Aadhar Number"
+        value={daughter.aadhar}
+        onChange={(e) =>
+          handleChildChange("daughters", index, "aadhar", e.target.value)
         }
         className="border p-2 rounded"
       />

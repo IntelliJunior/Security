@@ -17,63 +17,116 @@ public class Employee {
     private Long id;
 
     // Basic details
+    @Column(length = 30)
     private String through;
+    @Column(length = 55)
     private String phoneNo;
     private LocalDate date;
+    @Column(length = 50)
     private String name;
+    @Column(length = 55)
     private String mobile;
+    @Column(length = 50)
     private String fatherName;
+    @Column(length = 300)
     private String fatherOccupation;
     private LocalDate dateOfBirth;
     private LocalDate fatherDateOfBirth;
 
 
+
+    @Column(length = 12)
+    private String employeeAadhar;
+    @Column(length = 12)
+    private String employeeUan;
+    @Column(length = 12)
+    private String employeeInsuranceNo;
+    @Column(length = 20)
+    private String employeePfNo;
+
+    @Column(length = 12)
+    private String fatherAadhar;
+    @Column(length = 12)
+    private String motherAadhar;
+    @Column(length = 12)
+    private String wifeAadhar;
+
+
     private LocalDate motherDateOfBirth;
     private LocalDate wifeDateOfBirth;
+    @Column(length = 30)
     private String village;
+    @Column(length = 30)
     private String po;
-    private String block;
-    private String subdivision;
+    @Column(length = 30)
     private String district;
+    @Column(length = 6)
     private String pinCode;
+    @Column(length = 30)
     private String qualification;
+    @Column(length = 30)
     private String nearestRailwayStation;
 
     // Physical details
+    @Column(length = 50)
     private String identificationMark1;
+    @Column(length = 50)
     private String identificationMark2;
+    @Column(length = 30)
     private String chest;
+    @Column(length = 30)
     private String waist;
+    @Column(length = 30)
     private String pantLength;
+    @Column(length = 30)
     private String weight;
+    @Column(length = 30)
     private String height;
+    @Column(length = 30)
     private String bloodGroup;
 
     // Bank details
+    @Column(length = 50)
     private String accountHolderName;
+    @Column(length = 50)
     private String bankName;
+    @Column(length = 50)
     private String branchCode;
+    @Column(length = 50)
     private String accountNo;
+    @Column(length = 50)
     private String branch;
 
     // Present address
+    @Column(length = 50)
     private String careOf;
+    @Column(length = 50)
     private String moh;
+    @Column(length = 55)
     private String addressPhone;
+    @Column(length = 50)
     private String houseNo;
+    @Column(length = 50)
     private String roadNo;
-    private String wardNo;
+    @Column(length = 50)
     private String presentPo;
+    @Column(length = 50)
     private String presentPs;
+    @Column(length = 50)
     private String presentDistrict;
+    @Column(length = 50)
     private String presentState;
+    @Column(length = 50)
     private String presentPinCode;
 
     // Family details
+    @Column(length = 50)
     private String motherName;
+    @Column(length = 50)
     private String motherOccupation;
-
+    @Column(length = 50)
     private String wifeName;
+    @Column(length = 50)
     private String wifeOccupation;
 
     @ElementCollection
@@ -94,12 +147,19 @@ public class Employee {
 
 
     // Other details
+    @Column(length = 10)
     private Double totalFee;
+    @Column(length = 10)
     private Double paidAmount;
+    @Column(length = 10)
     private Double balance;
+    @Column(length = 50)
     private String appointmentUnit;
+    @Column(length = 50)
     private String post;
+    @Column(length = 50)
     private String licenseNo;
+    @Column(length = 50)
     private String validArea;
     private LocalDate renewalUpto;
 
@@ -187,22 +247,6 @@ public class Employee {
 
     public void setPo(String po) {
         this.po = po;
-    }
-
-    public String getBlock() {
-        return block;
-    }
-
-    public void setBlock(String block) {
-        this.block = block;
-    }
-
-    public String getSubdivision() {
-        return subdivision;
-    }
-
-    public void setSubdivision(String subdivision) {
-        this.subdivision = subdivision;
     }
 
     public String getDistrict() {
@@ -379,14 +423,6 @@ public class Employee {
 
     public void setRoadNo(String roadNo) {
         this.roadNo = roadNo;
-    }
-
-    public String getWardNo() {
-        return wardNo;
-    }
-
-    public void setWardNo(String wardNo) {
-        this.wardNo = wardNo;
     }
 
     public String getPresentPo() {
@@ -589,6 +625,62 @@ public class Employee {
 
     public void setRenewalUpto(LocalDate renewalUpto) {
         this.renewalUpto = renewalUpto;
+    }
+
+    public String getEmployeeAadhar() {
+        return employeeAadhar;
+    }
+
+    public void setEmployeeAadhar(String employeeAadhar) {
+        this.employeeAadhar = employeeAadhar;
+    }
+
+    public String getEmployeeUan() {
+        return employeeUan;
+    }
+
+    public void setEmployeeUan(String employeeUan) {
+        this.employeeUan = employeeUan;
+    }
+
+    public String getEmployeeInsuranceNo() {
+        return employeeInsuranceNo;
+    }
+
+    public void setEmployeeInsuranceNo(String employeeInsuranceNo) {
+        this.employeeInsuranceNo = employeeInsuranceNo;
+    }
+
+    public String getEmployeePfNo() {
+        return employeePfNo;
+    }
+
+    public void setEmployeePfNo(String employeePfNo) {
+        this.employeePfNo = employeePfNo;
+    }
+
+    public String getFatherAadhar() {
+        return fatherAadhar;
+    }
+
+    public void setFatherAadhar(String fatherAadhar) {
+        this.fatherAadhar = fatherAadhar;
+    }
+
+    public String getMotherAadhar() {
+        return motherAadhar;
+    }
+
+    public void setMotherAadhar(String motherAadhar) {
+        this.motherAadhar = motherAadhar;
+    }
+
+    public String getWifeAadhar() {
+        return wifeAadhar;
+    }
+
+    public void setWifeAadhar(String wifeAadhar) {
+        this.wifeAadhar = wifeAadhar;
     }
 
 
