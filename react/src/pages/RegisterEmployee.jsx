@@ -546,11 +546,32 @@ export default function RegisterEmployee() {
             {/* ARMS GUARD EXTRA FIELDS */}
                                     {isArmsGuard && (
                                       <Section title="Arms Guard Details">
-                                        <MemoizedInput name="licenseNo" placeholder="Licence No" value={form.licenseNo} onChange={handleChange} required />
-                                        <MemoizedInput name="validArea" placeholder="Valid Area" value={form.validArea} onChange={handleChange} required />
-                                        <MemoizedInput type="date" name="renewalUpto" placeholder="Renewal Upto" value={form.renewalUpto} onChange={handleChange} required />
+                                        <TextInput
+                                          name="licenseNo"
+                                          placeholder="Licence No"
+                                          value={form.licenseNo}
+                                          onChange={handleChange}
+                                          required
+                                        />
+
+                                        <TextInput
+                                          name="validArea"
+                                          placeholder="Valid Area"
+                                          value={form.validArea}
+                                          onChange={handleChange}
+                                          required
+                                        />
+
+                                        <TextInput
+                                          type="date"
+                                          name="renewalUpto"
+                                          value={form.renewalUpto}
+                                          onChange={handleChange}
+                                          required
+                                        />
                                       </Section>
                                     )}
+
 
           <button type="submit" className="bg-green-600 hover:bg-green-700 text-white py-2 px-6 rounded w-full">
             Register Employee

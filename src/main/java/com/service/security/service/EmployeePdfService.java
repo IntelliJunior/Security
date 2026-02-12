@@ -31,7 +31,7 @@ public class EmployeePdfService {
             document.open();
 
             // ======= FONTS =======
-            Font titleFont = new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD, BaseColor.BLUE);
+            Font titleFont = new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD, BaseColor.BLUE);
             Font subTitleFont = new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD);
             Font labelFont = new Font(Font.FontFamily.HELVETICA, 8, Font.BOLD);
             Font valueFont = new Font(Font.FontFamily.HELVETICA, 8);
@@ -43,7 +43,7 @@ public class EmployeePdfService {
 
             Paragraph address = new Paragraph(
                     "1st Floor, Flat No. 106, Meridian S. S. Vihar Apartment, Main Road, Karbigahiya, Patna – 800001\n" +
-                            "E-mail: nnssbr@gmail.com, system_care@hotmail.com, Mobile/Phone No - 93346 41000\n\n",
+                            "E-mail: nnssbr@gmail.com, system_care@hotmail.com, Ph-0612 2341000, Mob-9334641000\n\n",
                     valueFont);
             address.setAlignment(Element.ALIGN_CENTER);
             document.add(address);
@@ -55,7 +55,7 @@ public class EmployeePdfService {
             // ======= TITLE WITH DATE OF JOINING =======
             PdfPTable titleTable = new PdfPTable(3);
             titleTable.setWidthPercentage(100);
-            titleTable.setWidths(new float[]{30, 40, 30});
+            titleTable.setWidths(new float[]{40, 30, 30});
             titleTable.setSpacingBefore(10);
             titleTable.setSpacingAfter(10);
 
@@ -75,7 +75,8 @@ public class EmployeePdfService {
             regCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
 
 
-
+            Paragraph test = new Paragraph("THIS IS NEW VERSION 2026", valueFont);
+            document.add(test);
 // ---- Left: Title ----
             PdfPCell titleCell = new PdfPCell(
                     new Paragraph("EMPLOYEE REGISTRATION FORM", subTitleFont)
@@ -97,7 +98,7 @@ public class EmployeePdfService {
             dojCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
             dojCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
 
-            regCell.setNoWrap(true);
+            //regCell.setNoWrap(true);
             dojCell.setNoWrap(true);
 
 
