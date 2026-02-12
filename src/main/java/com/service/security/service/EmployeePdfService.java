@@ -74,9 +74,6 @@ public class EmployeePdfService {
             regCell.setHorizontalAlignment(Element.ALIGN_LEFT);
             regCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
 
-
-            Paragraph test = new Paragraph("THIS IS NEW VERSION 2026", valueFont);
-            document.add(test);
 // ---- Left: Title ----
             PdfPCell titleCell = new PdfPCell(
                     new Paragraph("EMPLOYEE REGISTRATION FORM", subTitleFont)
