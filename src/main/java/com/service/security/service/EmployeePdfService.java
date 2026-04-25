@@ -15,8 +15,10 @@ import java.io.ByteArrayOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -61,14 +63,15 @@ public class EmployeePdfService {
 
             // ---- Left: Registration Form ----
             String regForm = emp.getDate() != null
-                    ? formatDate(emp.getDate()) + "/NNSS/" +
-                    emp.getPresentState() + "/" +
-                    emp.getPresentDistrict() + "/" +
+                    ? "NNSSBRPAT" +
+                    formatDateForRegForm(emp.getDate())+
                     emp.getId()
-                    : "";
+                    : "NNSSBRPAT" +
+                    new SimpleDateFormat("dd-MM-yyyy").format(new Date()) +
+                    emp.getId();
 
             PdfPCell regCell = new PdfPCell(
-                    new Paragraph("Reg. Form: " + regForm, valueFont)
+                    new Paragraph("Reg. No: " + regForm, valueFont)
             );
             regCell.setBorder(Rectangle.NO_BORDER);
             regCell.setHorizontalAlignment(Element.ALIGN_LEFT);
@@ -353,6 +356,10 @@ public class EmployeePdfService {
 
     private String formatDate(LocalDate date) {
         return date != null ? date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) : "";
+    }
+
+    private String formatDateForRegForm(LocalDate date) {
+        return date != null ? date.format(DateTimeFormatter.ofPattern("ddMMyyyy")) : "";
     }
 
 }

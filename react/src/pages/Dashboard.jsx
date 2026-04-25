@@ -7,6 +7,18 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  const formatDate = (date) => {
+    if (!date) return "-";
+    const d = new Date(date);
+    if (isNaN(d)) return date;
+
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = d.getFullYear();
+
+    return `${day}-${month}-${year}`;
+  };
+
   // Fetch employees from backend
   const fetchEmployees = async () => {
     try {
@@ -86,13 +98,15 @@ export default function Dashboard() {
               </thead>
               <tbody className="text-gray-800 text-sm">
                 {employees.length > 0 ? (
-                  employees.map((emp) => (
+                  [...employees]
+                    .sort((a, b) => new Date(b.date) - new Date(a.date)) // DESC (latest first)
+                    .map((emp) => (
                     <tr
                       key={emp.id}
                       className="border-t hover:bg-gray-50 transition-colors"
                     >
                       <td className="py-2 px-4 border">{emp.name}</td>
-                      <td className="py-2 px-4 border">{emp.date || "-"}</td>
+                      <td className="py-2 px-4 border">{formatDate(emp.date)}</td>
                       <td className="py-2 px-4 border">{emp.mobile}</td>
                       <td className="py-2 px-4 border">{emp.fatherName}</td>
                       <td className="py-2 px-4 border">{emp.district}</td>

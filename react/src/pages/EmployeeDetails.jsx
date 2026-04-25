@@ -22,6 +22,18 @@ export default function EmployeeDetails() {
     fetchEmployee();
   }, [id, navigate]);
 
+  const formatDisplayDate = (isoDate) => {
+    if (!isoDate) return "";
+    const date = new Date(isoDate);
+    if (isNaN(date)) return isoDate; // fallback safety
+
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+
+    return `${day}-${month}-${year}`;
+  };
+
   const handlePrint = async () => {
     try {
       const res = await api.post("/pdf/employee", employee, {
@@ -77,15 +89,15 @@ export default function EmployeeDetails() {
           {/* BASIC DETAILS */}
           <Section title="Basic Details">
             <Item label="Name" value={employee.name} />
-            <Item label="Date Of Joining" value={employee.date} />
+            <Item label="Date Of Joining" value={formatDisplayDate(employee.date)} />
             <Item label="Mobile" value={employee.mobile} />
-            <Item label="Date of Birth" value={employee.dateOfBirth} />
+            <Item label="Date of Birth" value={formatDisplayDate(employee.dateOfBirth)} />
             <Item label="Employee Aadhar Number" value={employee.employeeAadhar} />
             <Item label="Employee UAN Number" value={employee.employeeUan} />
             <Item label="Employee Insurance Number" value={employee.employeeInsuranceNo} />
             <Item label="Employee PF Number" value={employee.employeePfNo} />
             <Item label="Father's Name" value={employee.fatherName} />
-            <Item label="Father DOB" value={employee.fatherDateOfBirth} />
+            <Item label="Father DOB" value={formatDisplayDate(employee.fatherDateOfBirth)} />
             <Item label="Father's Aadhar Number" value={employee.fatherAadhar} />
             <Item label="District" value={employee.district} />
             <Item label="Village" value={employee.village} />
@@ -137,11 +149,11 @@ export default function EmployeeDetails() {
           <Section title="Family Details">
             <Item label="Mother's Name" value={employee.motherName} />
             <Item label="Mother's Occupation" value={employee.motherOccupation} />
-            <Item label="Mother DOB" value={employee.motherDateOfBirth} />
+            <Item label="Mother DOB" value={formatDisplayDate(employee.motherDateOfBirth)} />
             <Item label="Mother Aadhar Number" value={employee.motherAadhar} />
             <Item label="Wife's Name" value={employee.wifeName} />
             <Item label="Wife's Occupation" value={employee.wifeOccupation} />
-            <Item label="Wife DOB" value={employee.wifeDateOfBirth} />
+            <Item label="Wife DOB" value={formatDisplayDate(employee.wifeDateOfBirth)} />
             <Item label="Wife Aadhar Number" value={employee.wifeAadhar} />
 
             <div className="col-span-2">
@@ -150,7 +162,7 @@ export default function EmployeeDetails() {
                 {employee.sons?.length
                   ? employee.sons.map((s, i) => (
                       <li key={i}>
-                        {s.name} (DOB: {s.dateOfBirth})(Aadhar: {s.aadhar})
+                        {s.name} (DOB: {formatDisplayDate(s.dateOfBirth)})(Aadhar: {s.aadhar})
                       </li>
                     ))
                   : " N/A"}
@@ -163,7 +175,7 @@ export default function EmployeeDetails() {
                 {employee.daughters?.length
                   ? employee.daughters.map((d, i) => (
                       <li key={i}>
-                        {d.name} (DOB: {d.dateOfBirth})(Aadhar: {d.aadhar})
+                        {d.name} (DOB: {formatDisplayDate(d.dateOfBirth)})(Aadhar: {d.aadhar})
                       </li>
                     ))
                   : " N/A"}
@@ -184,7 +196,7 @@ export default function EmployeeDetails() {
                       <Section title="Arms Guard Details">
                         <Item label="Licence No" value={employee.licenseNo} />
                         <Item label="Valid Area" value={employee.validArea} />
-                        <Item label="Renewal Upto" value={employee.renewalUpto} />
+                        <Item label="Renewal Upto" value={formatDisplayDate(employee.renewalUpto)} />
                       </Section>
                     )}
         </div>

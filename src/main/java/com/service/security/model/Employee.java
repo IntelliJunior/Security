@@ -1,6 +1,7 @@
 package com.service.security.model;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -33,8 +34,6 @@ public class Employee {
     private LocalDate dateOfBirth;
     private LocalDate fatherDateOfBirth;
 
-
-
     @Column(length = 12)
     private String employeeAadhar;
     @Column(length = 12)
@@ -50,7 +49,6 @@ public class Employee {
     private String motherAadhar;
     @Column(length = 12)
     private String wifeAadhar;
-
 
     private LocalDate motherDateOfBirth;
     private LocalDate wifeDateOfBirth;

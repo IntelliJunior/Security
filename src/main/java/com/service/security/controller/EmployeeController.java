@@ -2,6 +2,8 @@ package com.service.security.controller;
 
 import com.service.security.model.Employee;
 import com.service.security.service.EmployeeService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -9,6 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin/employees")
 @CrossOrigin(origins = "*")
+@Tag(name = "Employee", description = "API to search Employee")
 public class EmployeeController {
 
     private final EmployeeService service;
@@ -18,6 +21,7 @@ public class EmployeeController {
     }
 
     @GetMapping("/search")
+    @Operation(summary = "Search Employee by its Name, Mobile, FatherName, District, Village, Through")
     public List<Employee> searchEmployees(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String mobile,
