@@ -20,7 +20,7 @@ public class Employee {
     // Basic details
     @Column(length = 30)
     private String through;
-    @Column(length = 55)
+    @Column(length = 22)
     private String phoneNo;
     private LocalDate date;
     @Column(length = 50)
@@ -29,7 +29,7 @@ public class Employee {
     private String mobile;
     @Column(length = 50)
     private String fatherName;
-    @Column(length = 300)
+    @Column(length = 50)
     private String fatherOccupation;
     private LocalDate dateOfBirth;
     private LocalDate fatherDateOfBirth;
