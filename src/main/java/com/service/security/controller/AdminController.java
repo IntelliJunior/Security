@@ -26,7 +26,7 @@ public class AdminController {
     @PostMapping("/employees/register")
     @Operation(summary = "Register a Employee")
     public ResponseEntity<?> registerEmployee(
-            @RequestPart("employee") Employee employee,
+            @Valid @RequestPart("employee") Employee employee,
             @RequestPart(value = "photo", required = false) MultipartFile photo) {
 
         try {
