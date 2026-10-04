@@ -15,9 +15,15 @@ import java.util.Map;
 public class JwtUtil {
 
     private final Key key;
+    private final long expirationMs;
 
-    public JwtUtil(@Value("${jwt.secret}") String secret) {
+    // jwt.expiration-ms was already present in application.properties but was
+    // never actually read anywhere -- tokens were always issued with a
+    // hardcoded 1-hour lifetime regardless of that setting. It's now wired up.
+    public JwtUtil(@Value("${jwt.secret}") String secret,
+                   @Value("${jwt.expiration-ms}") long expirationMs) {
         this.key = Keys.hmacShaKeyFor(secret.getBytes());
+        this.expirationMs = expirationMs;
     }
 
     public String generateToken(String username, String role) {
@@ -25,7 +31,7 @@ public class JwtUtil {
                 .setSubject(username)
                 .addClaims(Map.of("role", role))
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 hour
+                .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }

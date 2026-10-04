@@ -22,14 +22,20 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
     List<Employee> findByThroughContainingIgnoreCase(String through);
 
-    // Optional advanced version - one endpoint for all
+    // Combines filters with AND (each one supplied narrows the results), not
+    // OR. Previously this used OR, so supplying more than one filter (e.g.
+    // district + village together) returned everything matching *either*
+    // field instead of the intersection -- searching got broader, not more
+    // specific, the more criteria you filled in. A null parameter still
+    // means "don't filter on this field" either way.
     @Query("SELECT e FROM Employee e WHERE " +
-            "(:name IS NOT NULL AND LOWER(e.name) LIKE LOWER(CONCAT(:name, '%'))) " +
-            "OR (:mobile IS NOT NULL AND e.mobile LIKE CONCAT(:mobile, '%')) " +
-            "OR (:fatherName IS NOT NULL AND LOWER(e.fatherName) LIKE LOWER(CONCAT(:fatherName, '%')))" +
-            "OR (:district IS NOT NULL AND LOWER(e.district) LIKE LOWER(CONCAT(:district, '%'))) " +
-            "OR (:village IS NOT NULL AND LOWER(e.village) LIKE LOWER(CONCAT(:village, '%'))) " +
-            "OR (:through IS NOT NULL AND LOWER(e.through) LIKE LOWER(CONCAT(:through, '%')))")
+            "(:name IS NULL OR LOWER(e.name) LIKE LOWER(CONCAT(:name, '%'))) " +
+            "AND (:mobile IS NULL OR e.mobile LIKE CONCAT(:mobile, '%')) " +
+            "AND (:fatherName IS NULL OR LOWER(e.fatherName) LIKE LOWER(CONCAT(:fatherName, '%'))) " +
+            "AND (:district IS NULL OR LOWER(e.district) LIKE LOWER(CONCAT(:district, '%'))) " +
+            "AND (:village IS NULL OR LOWER(e.village) LIKE LOWER(CONCAT(:village, '%'))) " +
+            "AND (:through IS NULL OR LOWER(e.through) LIKE LOWER(CONCAT(:through, '%'))) " +
+            "ORDER BY e.registeredAt DESC")
     List<Employee> searchEmployees(@Param("name") String name,
                                    @Param("mobile") String mobile,
                                    @Param("fatherName") String fatherName,
