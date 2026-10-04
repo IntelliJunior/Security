@@ -99,7 +99,6 @@ export default function Dashboard() {
               <tbody className="text-gray-800 text-sm">
                 {employees.length > 0 ? (
                   [...employees]
-                    .sort((a, b) => new Date(b.date) - new Date(a.date)) // DESC (latest first)
                     .map((emp) => (
                     <tr
                       key={emp.id}

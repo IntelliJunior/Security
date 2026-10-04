@@ -3,130 +3,252 @@ package com.service.security.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Validation constraints below intentionally mirror the checks already
+ * enforced in the React form (RegisterEmployee.jsx: the `maxLen(...)` calls
+ * and the regex checks under "EXISTING NUMBER CHECKS" / "PHONE / MOBILE
+ * VALIDATION" / "Arms Guard"). They exist here too so the API rejects bad
+ * input with a clean 400 even when called directly (Swagger, Postman, a
+ * future client) instead of relying solely on client-side checks. No new,
+ * stricter-than-the-UI rules were introduced.
+ */
 @Entity
 @Table(name = "employees")
 public class Employee {
+
+    private static final String TEN_DIGIT_NUMBER = "[0-9]{10}";
+    private static final String AADHAR_PATTERN = "^$|^[0-9]{12}$";
+    private static final String PIN_PATTERN = "^$|^[0-9]{6}$";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     // Basic details
+    @Size(max = 30, message = "Through must be at most 30 characters")
     @Column(length = 30)
     private String through;
+
+    // Up to 2 comma-separated 10-digit numbers (matches frontend rule)
+    @Size(max = 21, message = "Phone No must be at most 21 characters")
+    @Pattern(regexp = "^$|^" + TEN_DIGIT_NUMBER + "(\\s*,\\s*" + TEN_DIGIT_NUMBER + ")?$",
+            message = "Phone No can contain at most 2 numbers, each exactly 10 digits")
     @Column(length = 22)
     private String phoneNo;
+
     private LocalDate date;
+
+    @NotBlank(message = "Name is required")
+    @Size(max = 50, message = "Name must be at most 50 characters")
     @Column(length = 50)
     private String name;
+
+    // Up to 5 comma-separated 10-digit numbers (matches frontend rule)
+    @NotBlank(message = "Mobile is required")
+    @Size(max = 54, message = "Mobile must be at most 54 characters")
+    @Pattern(regexp = "^" + TEN_DIGIT_NUMBER + "(\\s*,\\s*" + TEN_DIGIT_NUMBER + "){0,4}$",
+            message = "Mobile can contain at most 5 numbers, each exactly 10 digits")
     @Column(length = 55)
     private String mobile;
+
+    @NotBlank(message = "Father Name is required")
+    @Size(max = 50, message = "Father Name must be at most 50 characters")
     @Column(length = 50)
     private String fatherName;
+
+    @Size(max = 50, message = "Father Occupation must be at most 50 characters")
     @Column(length = 50)
     private String fatherOccupation;
+
     private LocalDate dateOfBirth;
     private LocalDate fatherDateOfBirth;
 
+    @Size(max = 12, message = "Employee Aadhar must be at most 12 characters")
+    @Pattern(regexp = AADHAR_PATTERN, message = "Employee Aadhar must be exactly 12 digits")
     @Column(length = 12)
     private String employeeAadhar;
+
+    @Size(max = 12, message = "Employee UAN must be at most 12 characters")
     @Column(length = 12)
     private String employeeUan;
+
+    @Size(max = 12, message = "Employee Insurance No must be at most 12 characters")
     @Column(length = 12)
     private String employeeInsuranceNo;
+
+    @Size(max = 20, message = "Employee PF No must be at most 20 characters")
     @Column(length = 20)
     private String employeePfNo;
 
+    @Size(max = 12, message = "Father Aadhar must be at most 12 characters")
+    @Pattern(regexp = AADHAR_PATTERN, message = "Father Aadhar must be exactly 12 digits")
     @Column(length = 12)
     private String fatherAadhar;
+
+    @Size(max = 12, message = "Mother Aadhar must be at most 12 characters")
+    @Pattern(regexp = AADHAR_PATTERN, message = "Mother Aadhar must be exactly 12 digits")
     @Column(length = 12)
     private String motherAadhar;
+
+    @Size(max = 12, message = "Wife Aadhar must be at most 12 characters")
+    @Pattern(regexp = AADHAR_PATTERN, message = "Wife Aadhar must be exactly 12 digits")
     @Column(length = 12)
     private String wifeAadhar;
 
     private LocalDate motherDateOfBirth;
     private LocalDate wifeDateOfBirth;
+
+    @Size(max = 30, message = "Village must be at most 30 characters")
     @Column(length = 30)
     private String village;
+
+    @Size(max = 30, message = "PO must be at most 30 characters")
     @Column(length = 30)
     private String po;
+
+    @Size(max = 30, message = "District must be at most 30 characters")
     @Column(length = 30)
     private String district;
+
+    @NotBlank(message = "Pin Code is required")
+    @Pattern(regexp = PIN_PATTERN, message = "Pin Code must be exactly 6 digits")
     @Column(length = 6)
     private String pinCode;
+
+    @Size(max = 30, message = "Qualification must be at most 30 characters")
     @Column(length = 30)
     private String qualification;
+
+    @Size(max = 30, message = "Nearest Railway Station must be at most 30 characters")
     @Column(length = 30)
     private String nearestRailwayStation;
 
     // Physical details
+    @Size(max = 50, message = "Identification Mark 1 must be at most 50 characters")
     @Column(length = 50)
     private String identificationMark1;
+
+    @Size(max = 50, message = "Identification Mark 2 must be at most 50 characters")
     @Column(length = 50)
     private String identificationMark2;
+
+    @Size(max = 30, message = "Chest must be at most 30 characters")
     @Column(length = 30)
     private String chest;
+
+    @Size(max = 30, message = "Waist must be at most 30 characters")
     @Column(length = 30)
     private String waist;
+
+    @Size(max = 30, message = "Pant Length must be at most 30 characters")
     @Column(length = 30)
     private String pantLength;
+
+    @Size(max = 30, message = "Weight must be at most 30 characters")
     @Column(length = 30)
     private String weight;
+
+    @Size(max = 30, message = "Height must be at most 30 characters")
     @Column(length = 30)
     private String height;
+
+    @Size(max = 30, message = "Blood Group must be at most 30 characters")
     @Column(length = 30)
     private String bloodGroup;
 
     // Bank details
+    @Size(max = 50, message = "Account Holder Name must be at most 50 characters")
     @Column(length = 50)
     private String accountHolderName;
+
+    @Size(max = 50, message = "Bank Name must be at most 50 characters")
     @Column(length = 50)
     private String bankName;
+
+    @Size(max = 50, message = "IFSC Code must be at most 50 characters")
     @Column(length = 50)
     private String branchCode;
+
+    @Size(max = 50, message = "Account No must be at most 50 characters")
     @Column(length = 50)
     private String accountNo;
+
+    @Size(max = 50, message = "Branch must be at most 50 characters")
     @Column(length = 50)
     private String branch;
 
     // Present address
+    @Size(max = 50, message = "Care Of must be at most 50 characters")
     @Column(length = 50)
     private String careOf;
+
+    @Size(max = 50, message = "Mohalla must be at most 50 characters")
     @Column(length = 50)
     private String moh;
+
+    @Size(max = 55, message = "Address Phone must be at most 55 characters")
     @Column(length = 55)
     private String addressPhone;
+
+    @Size(max = 50, message = "House No must be at most 50 characters")
     @Column(length = 50)
     private String houseNo;
+
+    @Size(max = 50, message = "Road No must be at most 50 characters")
     @Column(length = 50)
     private String roadNo;
+
+    @Size(max = 50, message = "Present PO must be at most 50 characters")
     @Column(length = 50)
     private String presentPo;
+
+    @Size(max = 50, message = "Present PS must be at most 50 characters")
     @Column(length = 50)
     private String presentPs;
+
+    @Size(max = 50, message = "Present District must be at most 50 characters")
     @Column(length = 50)
     private String presentDistrict;
+
+    @Size(max = 50, message = "Present State must be at most 50 characters")
     @Column(length = 50)
     private String presentState;
+
+    @Size(max = 50, message = "Present Pin Code must be at most 50 characters")
+    @Pattern(regexp = PIN_PATTERN, message = "Present Pin Code must be exactly 6 digits")
     @Column(length = 50)
     private String presentPinCode;
 
     // Family details
+    @Size(max = 50, message = "Mother Name must be at most 50 characters")
     @Column(length = 50)
     private String motherName;
+
+    @Size(max = 50, message = "Mother Occupation must be at most 50 characters")
     @Column(length = 50)
     private String motherOccupation;
+
+    @Size(max = 50, message = "Wife Name must be at most 50 characters")
     @Column(length = 50)
     private String wifeName;
+
+    @Size(max = 50, message = "Wife Occupation must be at most 50 characters")
     @Column(length = 50)
     private String wifeOccupation;
 
+    @Valid
     @ElementCollection
     @CollectionTable(
             name = "employee_sons",
@@ -136,6 +258,7 @@ public class Employee {
 
 
 
+    @Valid
     @ElementCollection
     @CollectionTable(
             name = "employee_daughters",
@@ -145,25 +268,68 @@ public class Employee {
 
 
     // Other details
+    @PositiveOrZero(message = "Total Fee cannot be negative")
     @Column(length = 10)
     private Double totalFee;
+
+    @PositiveOrZero(message = "Paid Amount cannot be negative")
     @Column(length = 10)
     private Double paidAmount;
+
+    @PositiveOrZero(message = "Balance cannot be negative")
     @Column(length = 10)
     private Double balance;
+
+    @Size(max = 50, message = "Appointment Unit must be at most 50 characters")
     @Column(length = 50)
     private String appointmentUnit;
+
+    @NotBlank(message = "Post is required")
+    @Size(max = 50, message = "Post must be at most 50 characters")
     @Column(length = 50)
     private String post;
+
+    @Size(max = 50, message = "License No must be at most 50 characters")
     @Column(length = 50)
     private String licenseNo;
+
+    @Size(max = 50, message = "Valid Area must be at most 50 characters")
     @Column(length = 50)
     private String validArea;
+
     private LocalDate renewalUpto;
 
     private LocalDateTime registeredAt = LocalDateTime.now();
 
     private String photo;
+
+    // -----------------------------------------------------------------
+    // Cross-field rules (mirrors the same checks already performed in
+    // RegisterEmployee.jsx's validate() function).
+    // -----------------------------------------------------------------
+
+    // @JsonIgnore prevents these validator methods (named isXxx, which looks
+    // like a bean-property getter) from being serialized as extra fields in
+    // API responses -- they exist for validation only, not as data.
+    @AssertTrue(message = "License No, Valid Area and Renewal Upto are required for Arms Guard post")
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    private boolean isArmsGuardDetailsValid() {
+        if (post == null || !"Arms Guard".equalsIgnoreCase(post.trim())) {
+            return true;
+        }
+        return licenseNo != null && !licenseNo.isBlank()
+                && validArea != null && !validArea.isBlank()
+                && renewalUpto != null;
+    }
+
+    @AssertTrue(message = "Paid Amount cannot exceed Total Fee")
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    private boolean isPaidAmountValid() {
+        if (totalFee == null || paidAmount == null) {
+            return true;
+        }
+        return paidAmount <= totalFee;
+    }
 
     public Long getId() {
         return id;

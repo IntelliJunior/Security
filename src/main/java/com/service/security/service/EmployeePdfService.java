@@ -8,6 +8,9 @@ import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.pdf.draw.LineSeparator;
 import com.service.security.model.Child;
 import com.service.security.model.Employee;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
@@ -23,6 +26,17 @@ import java.util.List;
 
 @Service
 public class EmployeePdfService {
+
+    private static final Logger log = LoggerFactory.getLogger(EmployeePdfService.class);
+
+    // Same property EmployeeService writes photos into -- this class used to
+    // hardcode its own, different, source-tree-relative path
+    // ("src/main/resources/static"), which never matched where the photo
+    // was actually saved once running outside of `gradle run` from source
+    // (e.g. the packaged .exe), so photos silently never appeared in
+    // generated PDFs for anyone using the installed app.
+    @Value("${file.upload-dir}")
+    private String uploadDir;
 
     public ByteArrayInputStream generateEmployeePdf(Employee emp) {
         Document document = new Document(PageSize.A4, 36, 36, 36, 36);
@@ -150,9 +164,15 @@ public class EmployeePdfService {
 
             if (emp.getPhoto() != null && !emp.getPhoto().isEmpty()) {
                 try {
-                    // Normalize and resolve actual path
+                    // emp.getPhoto() is stored as "uploads/employees/<filename>"
+                    // for readability, but the actual directory photos are
+                    // written to (and must be read from) is the configured
+                    // file.upload-dir -- so only the file name is taken from
+                    // the stored value, and it's resolved against that same
+                    // configured directory.
                     String relativePath = emp.getPhoto().replace("\\", "/");
-                    Path imagePath = Paths.get("src/main/resources/static", relativePath);
+                    String fileName = Paths.get(relativePath).getFileName().toString();
+                    Path imagePath = Paths.get(uploadDir).resolve(fileName).normalize();
 
                     if (Files.exists(imagePath)) {
                         Image empPhoto = Image.getInstance(imagePath.toAbsolutePath().toString());
@@ -160,10 +180,10 @@ public class EmployeePdfService {
                         empPhoto.setAlignment(Element.ALIGN_RIGHT);
                         rightCell.addElement(empPhoto);
                     } else {
-                        System.out.println("⚠️ Photo not found at: " + imagePath.toAbsolutePath());
+                        log.warn("Photo not found for employee id={} at: {}", emp.getId(), imagePath.toAbsolutePath());
                     }
                 } catch (Exception imgEx) {
-                    imgEx.printStackTrace();
+                    log.warn("Could not load photo for employee id={}", emp.getId(), imgEx);
                 }
             }
 
@@ -297,7 +317,14 @@ public class EmployeePdfService {
 
             document.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            // Previously this just printed the stack trace and fell through
+            // to return whatever bytes had been written so far -- since
+            // document.close() hadn't run, that's an incomplete/corrupt PDF,
+            // silently returned with an HTTP 200 as if generation had
+            // succeeded. This now fails loudly instead, so the controller
+            // (and caller) gets a clear error rather than a broken file.
+            log.error("Failed to generate PDF for employee id={}", emp.getId(), e);
+            throw new RuntimeException("Failed to generate employee PDF", e);
         }
 
         return new ByteArrayInputStream(out.toByteArray());

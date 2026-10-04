@@ -8,9 +8,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+// CORS is handled centrally by SecurityConfig.corsConfigurationSource()
+// (localhost:5173 / localhost:8888). This used to also carry
+// @CrossOrigin(origins = "*") here, which -- since Spring lets a
+// controller-level @CrossOrigin override the global CORS config for that
+// controller's own mappings -- meant this specific controller accepted
+// requests from ANY origin regardless of the global allow-list.
 @RestController
 @RequestMapping("/api/admin/employees")
-@CrossOrigin(origins = "*")
 @Tag(name = "Employee", description = "API to search Employee")
 public class EmployeeController {
 

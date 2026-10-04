@@ -1,10 +1,11 @@
+
 # SecurityApp -- Build & Installer Guide
 
 This guide explains how to:
 
 -   Rebuild the Spring Boot project
 -   Generate the executable `.exe`
--   Install and run the application
+-   Install and run the application (with a visible console window showing logs)
 
 ------------------------------------------------------------------------
 
@@ -12,11 +13,11 @@ This guide explains how to:
 
 Make sure you have:
 
--   Java 21 installed\
+-   Java 21 installed
 
--   Gradle installed (or use `gradlew`)\
+-   Gradle installed (the project's bundled `gradlew.bat` works too — no separate Gradle install needed)
 
--   WiX Toolset 3.11 installed\
+-   WiX Toolset 3.11 installed
 
 -   WiX added to PATH:
 
@@ -47,6 +48,12 @@ WHERE NOT EXISTS (
 );
 ```
 
+> ⚠️ **Verify this hash before relying on it.** The guide documents the login
+> password as `admin123` in Step 6. Confirm the bcrypt hash above actually
+> encodes `admin123` (e.g. with a small Spring Boot `BCryptPasswordEncoder`
+> test, or `htpasswd -bnBC 10 "" admin123`) before shipping this to anyone —
+> otherwise the documented credentials won't work on first login.
+
 ------------------------------------------------------------------------
 
 ## ⚙️ Step 2 -- Update application.properties
@@ -62,9 +69,9 @@ spring.jpa.defer-datasource-initialization=true
 
 ## 🔨 Step 3 -- Rebuild Project
 
-From project root:
+From project root (Windows):
 
-    ./gradlew clean bootJar
+    gradlew.bat clean bootJar
 
 Verify jar exists:
 
@@ -74,13 +81,10 @@ Verify jar exists:
 
 ## 🏗️ Step 4 -- Create Windows Installer (.exe)
 
-Run:
-
-
-Below is a production / enterprise-grade jpackage command with:
+Below is the production/enterprise-grade `jpackage` command with:
 
 ✅ Custom icon
-✅ No console window
+✅ **Visible console window with live logs**
 ✅ Vendor name
 ✅ Versioned installer
 ✅ Upgrade support
@@ -88,86 +92,82 @@ Below is a production / enterprise-grade jpackage command with:
 ✅ Start menu + Desktop shortcut
 ✅ Install directory chooser
 
-🏢 Enterprise-Grade One-Liner
-jpackage --type exe --input build/libs --name NNSSApp --main-jar security-0.0.1-SNAPSHOT.jar --dest dist --app-version 1.0.0 --vendor "NEW NATIONAL SECURITY SERVICES" --description "NEW NATIONAL SECURITY SERVICES Management System" --copyright "Copyright 2026 NEW NATIONAL SECURITY SERVICES" --icon src/main/resources/icon.ico --win-menu --win-shortcut --win-dir-chooser --win-per-user-install --win-console --win-upgrade-uuid 12345678-1234-1234-1234-123456789abc
+### 🏢 Enterprise-Grade One-Liner
 
+```
+jpackage --type exe --input build/libs --name SecurityApp --main-jar security-0.0.1-SNAPSHOT.jar --dest dist --app-version 1.0.0 --vendor "NEW NATIONAL SECURITY SERVICES" --description "NEW NATIONAL SECURITY SERVICES Management System" --copyright "Copyright 2026 NEW NATIONAL SECURITY SERVICES" --icon src/main/resources/icon.ico --win-menu --win-shortcut --win-dir-chooser --win-per-user-install --win-console --win-upgrade-uuid 12345678-1234-1234-1234-123456789abc
+```
 
-🔥 What Each Enterprise Flag Does
-🎨 Custom Icon
---icon src/main/resources/icon.ico
+### 🔥 What Each Enterprise Flag Does
 
+**🎨 Custom Icon**
 
-✔ Must be .ico file
+    --icon src/main/resources/icon.ico
+
+✔ Must be a `.ico` file
 ✔ 256x256 recommended
 
-🏢 Vendor Branding
---vendor "NNSS Technologies Pvt Ltd"
+**🏢 Vendor Branding**
 
+    --vendor "NEW NATIONAL SECURITY SERVICES"
 
 Shows in:
+- Control Panel
+- Installer
+- Uninstall section
 
-Control Panel
+**📦 Upgrade Support (VERY IMPORTANT)**
 
-Installer
+    --win-upgrade-uuid 12345678-1234-1234-1234-123456789abc
 
-Uninstall section
-
-📦 Upgrade Support (VERY IMPORTANT)
---win-upgrade-uuid 12345678-1234-1234-1234-123456789abc
-
-
-✔ Keeps same UUID forever
+✔ Keeps the same UUID forever
 ✔ Allows seamless upgrades
 ✔ Prevents duplicate installations
 
-⚠️ Never change this UUID for future versions.
+⚠️ **Never change this UUID for future versions.**
 
 To generate your own UUID:
 
-uuidgen
+    uuidgen
 
-🖥 No Console Window
+**🖥 Console Window Visible (as requested)**
 
-Since you did NOT include:
+    --win-console
 
---win-console
+✔ Launches a console/terminal window alongside the app
+✔ Shows live Spring Boot logs while the application is running
+✔ Close the console window to stop the application
 
+If you ever want a silent background app instead, just drop this flag —
+but since you want to watch the logs, keep it in.
 
-✔ App runs silently
-✔ No black CMD window
+### 🚀 Future Upgrade Command (Example v1.1.0)
 
-🚀 Future Upgrade Command (Example v1.1.0)
-jpackage --type exe --input build/libs --name NNSSApp --main-jar security-0.0.1-SNAPSHOT.jar --dest dist --app-version 1.1.0 --vendor "NNSS Technologies Pvt Ltd" --description "NNSS Security Management System" --copyright "Copyright 2026 NNSS Technologies" --icon src/main/resources/icon.ico --win-menu --win-shortcut --win-dir-chooser --win-per-user-install --win-upgrade-uuid 12345678-1234-1234-1234-123456789abc
-
+```
+jpackage --type exe --input build/libs --name SecurityApp --main-jar security-0.0.1-SNAPSHOT.jar --dest dist --app-version 1.1.0 --vendor "NEW NATIONAL SECURITY SERVICES" --description "NEW NATIONAL SECURITY SERVICES Management System" --copyright "Copyright 2026 NEW NATIONAL SECURITY SERVICES" --icon src/main/resources/icon.ico --win-menu --win-shortcut --win-dir-chooser --win-per-user-install --win-console --win-upgrade-uuid 12345678-1234-1234-1234-123456789abc
+```
 
 Just change:
 
---app-version
+    --app-version
 
+The installer will automatically:
+- Detect the old version
+- Upgrade it
+- Keep user data
 
-Installer will automatically:
-
-Detect old version
-
-Upgrade it
-
-Keep user data
-
-🏆 True Enterprise Checklist
+### 🏆 True Enterprise Checklist
 
 Before building:
 
-✔ gradlew clean bootJar
-
-✔ Confirm jar exists in build/libs
-
-✔ Confirm icon file exists
-
-✔ Use SAME upgrade UUID forever
-
+✔ `gradlew.bat clean bootJar`
+✔ Confirm the jar exists in `build\libs`
+✔ Confirm the icon file exists
+✔ Use the **same** `--win-upgrade-uuid` forever
 ✔ WiX installed (v3.11)
+✔ Confirm `--name` matches what you expect in Start Menu / shortcuts (`SecurityApp`)
 
-Installer will be created inside:
+The installer will be created inside:
 
     dist\SecurityApp-1.0.0.exe
 
@@ -175,15 +175,16 @@ Installer will be created inside:
 
 ## 💻 Step 5 -- Install Application
 
-1.  Open `dist` folder\
-2.  Double-click `SecurityApp-1.0.0.exe`\
+1.  Open the `dist` folder
+2.  Double-click `SecurityApp-1.0.0.exe`
 3.  Click:
-    -   Next\
-    -   Install\
+    -   Next
+    -   Install
     -   Finish
 
-If Windows SmartScreen appears: - Click **More info** - Click **Run
-anyway**
+If Windows SmartScreen appears:
+-   Click **More info**
+-   Click **Run anyway**
 
 ------------------------------------------------------------------------
 
@@ -191,23 +192,31 @@ anyway**
 
 After installation:
 
--   Use Desktop shortcut\
-    OR\
+-   Use the Desktop shortcut
+    OR
 -   Open from Start Menu → SecurityApp
 
-Then open browser:
+A console window will open and stay open, streaming the application logs.
+Leave it running in the background while you use the app; closing it will
+stop the application.
+
+Then open your browser to:
 
     http://localhost:8888
-Username:admin@example.com
-Password:admin123
+
+Login:
+
+    Username: admin@example.com
+    Password: admin123
+
 ------------------------------------------------------------------------
 
 ## 🔄 Rebuilding After Changes
 
 Whenever you modify code or configuration:
 
-    gradlew clean bootJar
-    jpackage ...
+    gradlew.bat clean bootJar
+    jpackage --type exe --input build/libs --name SecurityApp --main-jar security-0.0.1-SNAPSHOT.jar --dest dist --app-version <new-version> --vendor "NEW NATIONAL SECURITY SERVICES" --description "NEW NATIONAL SECURITY SERVICES Management System" --copyright "Copyright 2026 NEW NATIONAL SECURITY SERVICES" --icon src/main/resources/icon.ico --win-menu --win-shortcut --win-dir-chooser --win-per-user-install --win-console --win-upgrade-uuid 12345678-1234-1234-1234-123456789abc
 
 Then reinstall using the new `.exe`.
 
@@ -215,7 +224,7 @@ Then reinstall using the new `.exe`.
 
 ## 📦 Production Notes
 
--   Installer includes bundled Java runtime
--   No system Java required
--   Admin user auto-created on first startup
+-   Installer includes a bundled Java runtime — no system Java required on the target machine
+-   Admin user auto-created on first startup (verify the password hash as noted in Step 1)
+-   Console window stays open and shows live logs while the app runs
 -   Safe for internal distribution

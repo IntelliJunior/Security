@@ -13,10 +13,20 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
 public class EmployeeService {
+
+    // Only these image types are accepted for the employee photo. Previously
+    // any file at all was accepted and the caller-supplied file name was
+    // appended as-is into the stored path.
+    private static final Set<String> ALLOWED_PHOTO_CONTENT_TYPES =
+            Set.of("image/jpeg", "image/png", "image/webp");
+    private static final Set<String> ALLOWED_PHOTO_EXTENSIONS =
+            Set.of("jpg", "jpeg", "png", "webp");
 
     private final EmployeeRepository repo;
 
@@ -31,12 +41,24 @@ public class EmployeeService {
     public Employee saveEmployee(Employee employee, MultipartFile photo) throws IOException {
         if (photo != null && !photo.isEmpty()) {
 
+            String extension = extractExtension(photo.getOriginalFilename());
+            String contentType = photo.getContentType();
+
+            if (extension == null || !ALLOWED_PHOTO_EXTENSIONS.contains(extension)
+                    || contentType == null || !ALLOWED_PHOTO_CONTENT_TYPES.contains(contentType.toLowerCase(Locale.ROOT))) {
+                throw new IllegalArgumentException(
+                        "Employee photo must be a JPG, PNG or WEBP image");
+            }
+
             // Use the configured folder
             Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
             Files.createDirectories(uploadPath);
 
-            // Unique file name
-            String fileName = UUID.randomUUID() + "_" + photo.getOriginalFilename();
+            // File name is a fresh UUID plus only the validated extension --
+            // the caller-supplied original file name is discarded entirely
+            // rather than appended, so it can no longer carry unexpected
+            // characters or path segments into the stored file name.
+            String fileName = UUID.randomUUID() + "." + extension;
             Path filePath = uploadPath.resolve(fileName);
 
             // Save file permanently
@@ -47,6 +69,21 @@ public class EmployeeService {
         }
 
         return repo.save(employee);
+    }
+
+    /**
+     * Returns the lowercased extension (without the dot), or null if the
+     * file name is missing, has no extension, or ends with a dot.
+     */
+    private String extractExtension(String originalFilename) {
+        if (originalFilename == null) {
+            return null;
+        }
+        int dotIndex = originalFilename.lastIndexOf('.');
+        if (dotIndex < 0 || dotIndex == originalFilename.length() - 1) {
+            return null;
+        }
+        return originalFilename.substring(dotIndex + 1).toLowerCase(Locale.ROOT);
     }
 
 
@@ -114,6 +151,11 @@ public class EmployeeService {
         emp.setPresentPo(updated.getPresentPo());
         emp.setPresentPs(updated.getPresentPs());
         emp.setPresentDistrict(updated.getPresentDistrict());
+        // These two were previously never copied over, so edits to Present
+        // State / Present Pin Code on an existing employee were silently
+        // discarded on update.
+        emp.setPresentState(updated.getPresentState());
+        emp.setPresentPinCode(updated.getPresentPinCode());
 
         // Family details
         emp.setMotherName(updated.getMotherName());
@@ -171,21 +213,30 @@ public class EmployeeService {
     }
 
     public List<Employee> searchEmployees(String name, String mobile, String fatherName, String district, String village, String through) {
-        if (name != null && !name.isBlank()) {
-            return repo.searchEmployees(name, mobile, fatherName, district, village, through);
-        } else if (mobile != null && !mobile.isBlank()) {
-            return repo.searchEmployees(name, mobile, fatherName, district, village, through);
-        } else if (fatherName != null && !fatherName.isBlank()) {
-            return repo.searchEmployees(name, mobile, fatherName, district, village, through);
-        }else if (district != null && !district.isBlank()) {
-            return repo.searchEmployees(name, mobile, fatherName, district, village, through);
-        }else if (village != null && !village.isBlank()) {
-            return repo.searchEmployees(name, mobile, fatherName, district, village, through);
-        }else if (through != null && !through.isBlank()) {
-            return repo.searchEmployees(name, mobile, fatherName, district, village, through);
-        } else {
+        // Previously this if/else chain called repo.searchEmployees(...) with
+        // the exact same arguments in every branch -- it only ever decided
+        // *whether* to search, never changed *how*. The real filtering
+        // combination logic lives in the @Query itself (see
+        // EmployeeRepository), which used to OR every field together, so
+        // filling in e.g. both district and village returned anything
+        // matching *either* one instead of narrowing the results.
+        name = blankToNull(name);
+        mobile = blankToNull(mobile);
+        fatherName = blankToNull(fatherName);
+        district = blankToNull(district);
+        village = blankToNull(village);
+        through = blankToNull(through);
+
+        if (name == null && mobile == null && fatherName == null
+                && district == null && village == null && through == null) {
             return List.of(); // empty list when nothing searched
         }
+
+        return repo.searchEmployees(name, mobile, fatherName, district, village, through);
+    }
+
+    private String blankToNull(String value) {
+        return (value == null || value.isBlank()) ? null : value.trim();
     }
 
 }
